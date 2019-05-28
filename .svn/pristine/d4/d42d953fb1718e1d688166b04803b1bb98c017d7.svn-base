@@ -1,0 +1,1517 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@page import="java.util.List"%>
+<%@page import="com.cal.bean.OrderDetails"%>
+<%@page import="com.cal.bean.ProcessDetails"%>
+<%@page import="com.cal.bean.ProcessInfo"%>
+<%@page import="com.cal.bean.MaterialInfo"%>
+<%@page import="com.cal.bean.GoodsTypeInfo"%>
+<%
+	 OrderDetails orderDetails = (OrderDetails) request.getAttribute("orderDetails");
+
+     List<ProcessDetails> processDetails = (List<ProcessDetails>) request.getAttribute("processDetails");
+	 
+	 List<List<ProcessInfo>> processInfos = (List<List<ProcessInfo>>) request.getAttribute("list2");
+	 
+	 List<ProcessInfo> list = (List<ProcessInfo>) request.getAttribute("processInfos");
+	 
+	 List<ProcessInfo> list2 = (List<ProcessInfo>) request.getAttribute("processInfo");
+ 
+    List<GoodsTypeInfo> goodsTypeInfos = (List<GoodsTypeInfo>) request.getAttribute("goodsTypeInfos");
+    List<MaterialInfo> materialInfos = (List<MaterialInfo>) request.getAttribute("materialInfos");
+    GoodsTypeInfo goodsTypeInfo = (GoodsTypeInfo)request.getAttribute("goodsTypeInfo");
+    MaterialInfo materialInfo = (MaterialInfo)request.getAttribute("materialInfo");
+    String goodsType = (String)request.getAttribute("goodsType");
+    
+    String parameterMm = orderDetails.getParameterMm();
+	parameterMm = parameterMm.replace("{", "");
+	parameterMm = parameterMm.replace("}", "");
+	parameterMm = parameterMm.replace("\"", "");
+	String[] parameters = parameterMm.split(",");
+%>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Calculator</title>
+ <link rel="shortcut icon" href="images/favicon1.ico">
+<link rel="stylesheet" href="css/calculator.css" />
+ <link rel="stylesheet" href="css/easydialog.css" />
+<script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="js/calculator.js"></script>
+<script type="text/javascript" src="js/easydialog.min.js"></script> 	
+<script type="text/javascript" src="js/process_info.js"></script> 
+<script>
+
+var processSize = "<%=processDetails.size()%>";
+
+$(function(){
+	
+         //==============修改材料信息JS======================
+		 var p = "<%=goodsTypeInfo.getGoodsType()%>";
+		
+		 if(p == 'Plates' || p == 'Round rod (round stick)' || p == 'Flat bar' ||  p == 'Square bar'){
+		    	$(".dimensions").prev().prev().hide();
+		     }else{
+		    	$(".dimensions").prev().prev().show();
+		     }
+		 
+		$(".father_product li").click(
+						function() {
+							var q = $(this).find("span").html();
+						    if(p == q){
+						    	return false;
+						    }else{
+						       p = q;
+						    }
+							$(".dimensions").html("");
+							$(this).addClass("active").siblings().removeClass("active");
+							var parameter = $(this).find("input:eq(0)").val();
+							var list = parameter.split("/");
+							var txt_lis = "";					
+							for(var i = 0; i < list.length; i++){
+								txt_lis += "<li class=\"txt_li\"><span>"+list[i]+"</span>"
+								+ " <div class=\"input-group\"> <input class=\"form-control\" type=\"text\"> <span class=\"input-group-btn\"> mm</span></div><input type=\"hidden\"></li>"															
+							}
+							
+							$(".dimensions").append(txt_lis);
+							//存储首页点击数据
+							 localStorage.sitename= $(this).index();
+							var name = $(this).find("span").html();
+							$(".plate i:eq(0)").html($(this).find("span").html());
+							var goodsType = $(".plate i:eq(0)").html();
+				 			$.post(
+				 					"/steelPlate/calculator/queryByGoodsType.do",
+				 					{
+				 					 "goodsType":goodsType,
+				 					 "currencyShorthand" : $('#select_currency').val()
+				 					},
+				 				   function(result){
+				     	            var txt_lis = "";
+				 				    if(result.state == 0){
+				 				    	
+				 				    	
+				 				   //判断标准参数是否存在（不存在的 Plates,Round rod (round stick),Flat bar,Square bar）
+				 				    	
+				 				     if(goodsType == 'Plates' || goodsType == 'Round Rod (Round Stick)' || goodsType == 'Flat Bar' ||  goodsType == 'Square Bar'){
+				 				    	$(".dimensions").prev().prev().hide();
+				 				     }else{
+				 				    	$(".dimensions").prev().prev().show();
+				 				     }
+				 				    	
+				 				    	
+				 				    	
+				 				    	$(".sub_item").html("");
+				 					  var list = result.data.materialInfos;
+				 					  var unitPrice = result.data.unitPrice;
+				 						if(unitPrice == "null"){
+				 							$(".plate .form-control-price").text(0);	
+				 						}else{
+				 							$(".plate .form-control-price").text(unitPrice);	
+				 						}	
+					 				 $(".plate i:eq(1)").html(list[0].materialType);	
+				 						
+				 					  for(var i = 0; i < list.length; i++){
+				 						var materialType =  list[i].materialType;
+				 						var din =  list[i].din;
+				 						var astm =  list[i].astm;
+				 						if(i == 0){
+					 							txt_lis+="<li class='active'><span>"+materialType+"</span></li>"; 
+					 							$('.plate').find('i:last').html(list[i].updateDate);	 					
+				 						}else{				
+					 							txt_lis+="<li><span>"+materialType+"</span></li>"; 
+				 						}
+				 						txt_lis+="<li><span>"+materialType+"</span></li>";
+				 					  }
+				 					  $(".sub_item").append(txt_lis);
+				 					 $(".item_box_img img").attr("src",result.data.goodsImage);
+				 					  
+				 					  //初始参数赋值
+					 					 var parameter = result.data.originalParameter;				    	
+									    	var s = parameter.split(",");
+								 			var tl = s.length;
+								             if(tl == 0){
+								             	return false;
+								             }          
+				 						$(".dimensions li").each(function(index, element) {
+							 				var type = $(this).find("span").html();
+							 				$(this).find("input").val();
+							                 for(var i=0;i<tl;i++){
+							                   var w = s[i].split(":");
+							                   if(w[0] == type){
+							                 	$(this).find("input").val(w[1]); 
+							                   }
+							               }						                 
+				 						
+				 						})	
+				 						//单位确认
+				 						if($("#select_unit").val() == "inch"){
+					 						$("#select_unit").change();
+				 						} 
+							           
+				 				  }else{
+				 					 easyDialog.open({
+				 			    		  container : {
+				 			    		    header : 'Prompt message',
+				 			    		    content : 'Query error,please try again'
+				 			    		  },
+				 			    		  autoClose : 1000
+				 			    		}); 
+				 				  }
+								  
+				 			  });
+		});
+		
+	
+		$("body").on("click",".sub_item li",function(){
+			$(this).addClass("active").siblings().removeClass("active");
+			$(".plate i:eq(1)").html($(this).find("span").text());
+			var materialType = $(this).find("span").text();
+			var goodsType = $(".plate i:eq(0)").text();
+			
+			$.ajax({
+	    		url : '/steelPlate/calculator/queryUnitPriceByMaterialInfo.do',
+				method : 'post',
+				data : {"goodsType":goodsType,
+	        		    "materialType" : materialType,
+	        		    "currencyShorthand" : $('#select_currency').val()
+        	           },
+				success : function(result) { 
+					if(result.state == 0){
+						if(result.data.price == "null"){
+							$(".plate .form-control-price").text(0);	
+						}else{
+							$(".plate .form-control-price").text(result.data.price);
+							$('.plate').find('i:last').html(result.data.updateDate);
+						}
+				    }	
+					
+				},
+				error : function(msg) {
+                    easyDialog.open({
+			    		  container : {
+			    		    header : 'Prompt message',
+			    		    content : 'No price has been found'
+			    		  },
+			    		  autoClose : 2000
+			    		}); 
+				}
+	    	})
+			
+			 
+		})
+// 		$(".father_product li:first").click();
+		
+
+		$("#sub1").click(function() {
+			if($(".sub_item li.active").length==0){
+				easyDialog.open({
+		    		  container : {
+		    		    header : 'Prompt message',
+		    		    content : 'Please select material'
+		    		  },
+		    		  autoClose : 1000
+		    		}); 
+				return;
+			}
+			var parameterMm = "";
+			var parameterInch = "";
+			var conversion = 25.4;
+			var inch = 0;
+			var mm = 0;
+			var check_flag=false;
+			$(".dimensions input[type='text']").each(function(index, element) {
+			    if($(this).val()==""){
+			    	 easyDialog.open({
+			    		  container : {
+			    		    header : 'Prompt message',
+			    		    content : $(this).parent().prev().html() +' can not empty'
+			    		  },
+			    		  autoClose : 1000
+			    		}); 
+			    	$(this).focus();
+			    	check_flag=false;
+			    	return false;
+				}else{
+					check_flag=true;
+				}
+			});
+			if(!check_flag){
+				return;
+			}
+			
+			
+			//控制数量不为空
+			if($(".item_box_img input:eq(1)").val() == 0){
+				 easyDialog.open({
+		    		  container : {
+		    		    header : 'Prompt message',
+		    		    content :'Qty per set can not be zero'
+		    		  },
+		    		  autoClose : 1000
+		    		}); 	
+				 return false;
+			}
+					
+			//防止重复点击
+			$('#sub1').css({"background-color":"#666"}).attr("disabled","true");
+			
+			
+			$(".dimensions li").each(function(index, element) {
+				if(index==$(".dimensions li").length-1){
+					if($(".unit .form_select").val() == 'mm'){
+						parameterMm +="\""+$(this).find("span").html()+"\""+":"+"\""+$(this).find("input").eq(1).val()+"\"";
+						mm = $(this).find("input").eq(1).val();
+						inch = mm/conversion;
+						parameterInch +="\""+$(this).find("span").html()+"\""+":"+"\""+inch+"\"";
+					}
+					if($(".unit .form_select").val() == 'inch'){
+						parameterInch +="\""+$(this).find("span").html()+"\""+":"+"\""+$(this).find("input").eq(1).val()+"\"";
+						inch = $(this).find("input").eq(1).val();
+						mm = Number(parseFloat(inch)).mul(conversion).toFixed(2);
+						parameterMm +="\""+$(this).find("span").html()+"\""+":"+"\""+mm+"\"";
+					}
+					
+				}else{
+					if($(".unit .form_select").val() == 'mm'){
+						parameterMm +="\""+$(this).find("span").html()+"\""+":"+"\""+$(this).find("input").eq(1).val()+"\",";
+						mm = $(this).find("input").eq(1).val();
+						inch = mm/conversion;
+						parameterInch +="\""+$(this).find("span").html()+"\""+":"+"\""+inch+"\",";
+					}
+					if($(".unit .form_select").val() == 'inch'){
+						parameterInch +="\""+$(this).find("span").html()+"\""+":"+"\""+$(this).find("input").eq(1).val()+"\",";
+						inch = $(this).find("input").eq(1).val();
+						mm = Number(parseFloat(inch)).mul(conversion).toFixed(2);
+						parameterMm +="\""+$(this).find("span").html()+"\""+":"+"\""+mm+"\",";
+					}
+				}
+			});
+			parameterMm="{"+parameterMm.substring(0)+"}";
+			parameterInch="{"+parameterInch.substring(0)+"}";
+			var goodsType = $(".plate i:eq(0)").html();
+			var materialType = $(".plate i:eq(1)").html();
+			var partName = $(".item_box_img input:eq(0)").val();
+			var quantity = $(".item_box_img input:eq(1)").val();
+			var price = $(".plate .form-control-price").text();
+            var orderDetailsId = $('#orderDetailsId').val();
+		   $.post(
+					"/steelPlate/calculator/updateOrderDetails.do",
+					{"goodsType":goodsType,
+	        		    "materialType" : materialType,
+	        		    "partName" : partName,
+	        		    "quantity" : quantity,
+	        		    "price"    : price,
+	        		    "parameterMm" : parameterMm,
+	        		    "parameterInch" : parameterInch,
+	        		    "orderDetailsId" : orderDetailsId,
+	        		    "currencyShorthand" : $('#select_currency').val()
+	        	       },
+			function(result){   
+	        	
+	        $('#sub1').css({"background-color":"#5d9cec"}).removeAttr("disabled");  		    	   
+	        	    	   
+				  if(result.state == 0){	
+				    	window.location.reload();
+		           
+				  }else{
+					  easyDialog.open({
+			    		  container : {
+			    		    header : 'Prompt message',
+			    		    content : 'Update failed'
+			    		  },
+			    		  autoClose : 1000
+			    		}); 
+				  }
+			  
+			  });
+		});
+
+		
+		// 乘法
+		Number.prototype.mul = function(arg) {
+		    var m = 0, s1 = this.toString(), s2 = arg.toString();
+		    try{m += s1.split(".")[1].length;}catch(e){}
+		    try{m += s2.split(".")[1].length;} catch(e){}
+		    return Number(s1.replace(".", "")) * Number(s2.replace(".", ""))/ Math.pow(10, m);
+		};
+		// 除法
+		Number.prototype.div = function(arg) {
+		    var t1 = 0, t2 = 0, r1, r2;
+		    try {t1 = this.toString().split(".")[1].length;}catch(e){}
+		    try {t2 = arg.toString().split(".")[1].length;}catch(e){}
+		    with (Math) {
+		        r1 = Number(this.toString().replace(".", ""));
+		        r2 = Number(arg.toString().replace(".", ""));
+		        return (r1 / r2) * pow(10, t2 - t1);
+		    }
+		};
+		
+		
+		$("#select_unit").change(function(){
+			$(".dimensions .input-group-btn").html($(this).val());
+			$(".dimensions li").each(function(index, element) {
+				if($(".unit .form_select").val() == 'mm'){
+					var inch = $(this).find("input").eq(1).val();
+					if(inch!=""){
+						var n1= parseFloat(inch).mul(25.4).toFixed(2);
+						$(this).find("input").eq(0).val(n1);
+						$(this).find("input").eq(1).val(Number(parseFloat(inch)).mul(25.4));
+					}
+				}
+				if($(".unit .form_select").val() == 'inch'){					
+					var mm = $(this).find("input").eq(1).val();
+					if(mm!=""){
+						var n2=Number(parseFloat(mm)).div(25.4).toFixed(2);
+						$(this).find("input").eq(0).val(n2);
+						$(this).find("input").eq(1).val(Number(parseFloat(mm)).div(25.4));
+					}
+					
+				}				
+			
+		  });
+
+		})	   
+
+		
+		
+				//input框输入的时候保证参数相同
+		$(".dimensions li").find('input').blur(function(){
+		    $(this).parents('li').find('input:last').val($(this).val());
+		})
+		
+		
+		/**
+		 *获取汇率事件
+	     */
+		$('#select_currency').change(function(){
+			var goodsType = $(".plate i:eq(0)").html();
+			var materialType = $(".plate i:eq(1)").html();
+			$.ajax({
+	    		url : '/steelPlate/calculator/queryByCurrencyShorthand.do',
+				method : 'post',
+				data : {
+					    "goodsType" : goodsType,
+					    "materialType" : materialType,
+	        		    "currencyShorthand" : $('#select_currency').val()
+        	           },
+				success : function(result) { 
+					if(result.price == "null"){
+						$(".plate .form-control-price").text(0);	
+					}else{
+						$(".plate .form-control-price").text(result.price);	
+					}
+					if($('#select_currency').val() == 'USD'){
+						$('.red_txt').text($('#rate_cny').val()+"CNY/USD");	
+					}else{
+						$('.red_txt').text(result.exchangeRate+$('#select_currency').val()+"/USD");	
+					}
+					
+				},
+				error : function(msg) {
+					 easyDialog.open({
+			    		  container : {
+			    		    header : 'Prompt message',
+			    		    content : 'No price has been found'
+			    		  },
+			    		  autoClose : 2000
+			    		}); 
+				}
+	    	})	
+						
+					
+		});		
+		
+
+
+	
+
+	//======================处理工艺=============		
+		
+		
+		
+	$("body").on("click",".add1",function(){
+		if($(".process_list li").length>5){
+			easyDialog.open({
+	    		  container : {
+	    		    header : 'Prompt message',
+	    		    content : 'Can only add six processes'
+	    		  },
+	    		  overlay : false,
+	    		  autoClose : 1000
+	    		}); 
+			return;
+		}
+		
+	    if($(".process_list li:eq(0)").css("visibility") == "hidden"){
+	       $(".process_list li:eq(0)").css({"visibility":"visible"});
+	       $('.w_add_1').hide();
+	       $('.w_add_2').show();
+	       return false;
+	    }
+		$(".process_list").append(	$(".process_list li:eq(0)").clone());
+		var v1=	$(".process_list li:eq(0)").find("select:eq(0)").val();
+		var v2=	$(".process_list li:eq(0)").find("select:eq(1)").val();
+		$(".process_list li:last").find("select:eq(0)").val(v1);
+		$(".process_list li:last").find("select:eq(1)").val(v2);
+		
+		var tl = $('.process_list').find("li").length;
+		for(var i=0;i<tl;i++){
+
+			 $(".process_list li:eq("+i+")").find("span:last").parent().show().css("display","inline-block");
+			 
+			 $(".process_list li:eq("+i+")").find("span:last").text(i+1);
+			
+		}
+		
+		return false;
+	})
+	
+	$("body").on("click","a.w-btn-delete",function(){
+		var tl = $('.process_list').find("li").length;
+		if(tl == 1){
+			$(this).parent().parent().parents("li").css({"visibility":"hidden"});
+			  $('.w_add_2').hide();
+			  $('.w_add_1').show();
+			 return false;
+		}else{
+			var tl = $(".process_list li").length;	
+			$(this).parent().parent().parents("li").remove();
+			for(var i=0;i<tl;i++){
+				$(".process_list li:eq("+i+")").find(".btn-control-num").text(i+1);	
+			}
+			 return false;	
+		}
+		  
+	})
+	
+	$(document).on("click",".fa-check",function(){
+		var onesideState = $('#oneside_state').val();
+		if(onesideState == 0){
+			return false;
+		}
+// 		var state = $(this).parents('.input-group').siblings(".input-group").find('input').eq(1).val();
+// 		if($(this).prev().val()==1 && state == 0){
+// 			return false;
+// 		}
+		
+		$(this).toggleClass("cur");
+		var superficialArea = parseFloat($('#superficialArea').val());
+		if($(this).prev().val()==0){
+			$(this).prev().val(1);
+			var s1 = parseFloat($(this).parent().parent().prev().children("input").val());
+			$(this).parent().parent().prev().children("input").val(superficialArea + s1);
+		}else{
+			$(this).prev().val(0);
+			var s1 = parseFloat($(this).parent().parent().prev().children("input").val());
+			$(this).parent().parent().prev().children("input").val(s1 - superficialArea);
+		}
+	})
+	
+	
+	
+	//工艺选择事件
+  	$("body").on("change",".select_process",function(){
+  	    var level1 = $(this).val();
+  	    $(this).next().find('.select_parameter').empty();
+	    $(this).next().find('.select_parameter_span').text('');
+	    $(this).siblings(".group_box").find(".input-group-btn").prev().val('');
+	    $(this).next().css({"display":"inline-block"});
+	    var This=$(this);
+	    var onesideState = $('#oneside_state').val();
+		$.post("queryByProcess.do",
+		       {"level1":level1},
+	   function(result){
+		    	   var txt_lis = "";
+					  if(result.state == 0){
+						  
+						   var level3_parameter = This.siblings(".group_box").find(".input-group-btn").prev().val();						   						   
+						   var level2Parameter = This.parent().parent().find("input:eq(0)").val();
+						   var level3Parameter = 1;
+						   
+						   
+						   var index = This.prop('selectedIndex');
+					       var parameter = $('#parameter').val();
+					       var json = eval('(' + parameter + ')');
+					       var thick = parseInt(json.thickness);	
+					       var superficialArea = parseFloat($('#superficialArea').val());
+					       
+					       var level2 = getLevel2(index);
+					       var level3 = getLevel3(index);
+					       var superficialState = getSuperficialState(index);
+					       var level2Explain = getLevel2Explain(index);
+					       
+					       var tl = 1;
+					       if(level2.length == 0){
+					    	   tl =1;
+					       }else{
+					    	   tl = level2.length;
+					       }
+						   
+						   
+						   
+						   
+						   
+						  for(var i = 0; i < tl; i++){
+							var p = level2[i];
+							if(superficialState=="1"){
+								This.next().find(".outside").css({"display":"inline-block"});
+								This.siblings(".group_box").find(".input-group").hide();
+								This.siblings(".model_label").find(".select_parameter").hide();								
+								var s_out_class = This.next().find("input.outside").next().attr('class');
+								var s_in_class = This.next().find("input.inside").next().attr('class');		
+
+							if(s_out_class == "fa fa-check" && s_out_class == 'fa fa-check'){
+								This.next().find("input.outside").next().toggleClass("cur");
+								This.next().find("input.outside").val(1);
+							}	
+								
+                             if(s_out_class == 'fa fa-check cur' && s_in_class == 'fa fa-check cur'){	 
+                             This.next().find(".outside").find(".number_txt").find("input").val(superficialArea*2);	
+                             This.next().find("input.outside").val(1);
+                             This.next().find("input.inside").val(1);
+                             }		
+                             if(onesideState == 0){
+                            	 This.next().find('.input-group').eq(1).hide();
+                            	 This.next().find('.input-group').eq(0).find("input:first").val('All surface');
+							 }
+                             
+							}else{								
+								This.next().find(".outside").css({"display":"none"});
+								This.siblings(".group_box").find(".input-group").show();
+								This.siblings(".model_label").find(".select_parameter").show();
+						        This.next().find("input.outside").val(0);
+		                        This.next().find("input.inside").val(0);
+							}
+							
+						    if(p=="" || p == undefined){
+						    	 This.next().find('.select_parameter').css({"display":"none"});
+						    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+						     }else{
+						    	 This.next().find('.select_parameter').css({"display":"inline-block"});
+						    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+						     }
+						    
+						     if(level2Explain==""){
+						    	 This.next().find('.select_parameter_span').css({"display":"none"});
+						    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+						     }else{
+						    	 This.next().find('.select_parameter_span').css({"display":"inline-block"});
+						    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+						     }
+						       
+						    if(p == level2Parameter){
+						    This.next().find('.select_parameter').append("<option value='"+p+"' selected='selected'>"+p+"</option>");							    
+						    }else{
+						    This.next().find('.select_parameter').append("<option value='"+p+"'>"+p+"</option>");	
+						    }
+						    
+							This.next().find('.select_parameter_span').text(level2Explain+":");
+							This.siblings(".group_box").find(".input-group-btn").text(level3);	
+						    This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							if(level3 == "kg"){
+								var weight = $('#order_weight').val();
+								This.siblings(".group_box").find(".input-group-btn").prev().val(Number(weight * 1000).toFixed(2));	
+							}				 
+							
+                           }			
+						  if(This.next().find('.select_parameter_span').text() == "Thickness:"){
+							  if(thick < 5){
+								  This.next().find(".select_parameter option[value='<5mm']").attr("selected",true);
+			                       }  
+							  if(thick >= 5 && thick < 10){
+								  This.next().find(".select_parameter option[value='5-10mm']").attr("selected",true);
+							       }
+							  if(thick >= 10){
+								   This.next().find(".select_parameter option[value='10-20mm']").attr("selected",true);
+							       }
+							  This.next().find('.select_parameter').attr("disabled","disabled");
+							  This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+						  }	else{
+							  This.next().find('.select_parameter').attr("disabled",false);
+						  }
+						  
+						  
+						  //只有板和扁钢可以折弯，3mm以上 建议100T
+						  if(level1 == 'Bending'){
+							  var thickness = $('#select_thickness').val();
+							  if(thickness > 3){
+								  This.next().find(".select_parameter option[value='100T']").attr("selected",true);  
+							  }
+						  }
+						  
+						  
+						  
+						  //如果是galvanizing，则给予提示
+						  if(level1 == 'Hot dip galvanizing' || level1 == 'Cold galvanizing'){
+							  This.next().next().find('.btn-control-div').prev().show();
+						  }else{
+							  This.next().next().find('.btn-control-div').prev().hide();
+						  }
+				       
+					  }else{
+						  alert(result.message);
+					  }
+				  
+				});
+	  		
+  	});
+	
+// 	$(".select_process").change();
+	show_process();
+})    
+
+//==============//处理工艺第一次显示================================================
+
+	  function show_process(){
+		$(".select_process").each(function(index, element){
+			
+			var level1 = $(this).val();
+			$(this).next().find('.select_parameter').empty();
+			$(this).next().find('.select_parameter_span').text('');
+			$(this).siblings(".group_box").find(".input-group-btn").prev().val('');
+			$(this).next().css({"display":"inline-block"});
+			var This=$(this);
+			var onesideState = $('#oneside_state').val();
+			$.post("queryByProcess.do",
+			       {"level1":level1},
+		   function(result){
+			    	   var txt_lis = "";
+						  if(result.state == 0){
+							  var list = result.data;
+						       var parameter = $('#parameter').val();
+						       var json = eval('(' + parameter + ')');
+						       var thick = parseInt(json.thickness);
+							   var level3_parameter = This.siblings(".group_box").find(".input-group-btn").prev().val();
+							   var superficialArea = parseFloat($('#superficialArea').val());						   						   
+							   var level2Parameter = This.parent().parent().find("input:eq(0)").val();
+							   var level3Parameter = This.parent().parent().find("input:eq(1)").val();
+							   
+							  for(var i = 0; i < list.length; i++){
+								var p = list[i].level2;
+								if(list[i].superficialState=="1"){
+									This.next().find(".outside").css({"display":"inline-block"});
+									This.siblings(".group_box").find(".input-group").hide();
+									This.siblings(".model_label").find(".select_parameter").hide();								
+									var s_out_class = This.next().find("input.outside").next().attr('class');
+									var s_in_class = This.next().find("input.inside").next().attr('class');		
+									
+	                             if(s_out_class == 'fa fa-check cur' && s_in_class == 'fa fa-check cur'){	 
+	                             This.next().find(".outside").find(".number_txt").find("input").val(superficialArea*2);	
+	                             This.next().find("input.outside").val(1);
+	                             This.next().find("input.inside").val(1);
+	                             }	
+	                             if(onesideState == 0){
+	                            	 This.next().find('.input-group').eq(1).hide();
+	                            	 This.next().find('.input-group').eq(0).find("input:first").val('All surface');
+								 }
+	                             
+									
+								}else{								
+									This.next().find(".outside").css({"display":"none"});
+									This.siblings(".group_box").find(".input-group").show();
+									This.siblings(".model_label").find(".select_parameter").show();
+							        This.next().find("input.outside").val(0);
+			                        This.next().find("input.inside").val(0);
+								}
+								
+							    if(p==""){
+							    	 This.next().find('.select_parameter').css({"display":"none"});
+							    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							     }else{
+							    	 This.next().find('.select_parameter').css({"display":"inline-block"});
+							    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							     }
+							    
+							     if(list[i].level2Explain==""){
+							    	 This.next().find('.select_parameter_span').css({"display":"none"});
+							    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							     }else{
+							    	 This.next().find('.select_parameter_span').css({"display":"inline-block"});
+							    	 This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							     }
+							       
+							    if(p == level2Parameter){
+							    This.next().find('.select_parameter').append("<option value='"+p+"' selected='selected'>"+p+"</option>");							    
+							    }else{
+							    This.next().find('.select_parameter').append("<option value='"+p+"'>"+p+"</option>");	
+							    }
+							    
+								This.next().find('.select_parameter_span').text(list[i].level2Explain+":");
+								This.siblings(".group_box").find(".input-group-btn").text(list[i].level3);	
+							    This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+								if(list[i].level3 == "kg"){
+									var weight = $('#order_weight').val();
+									This.siblings(".group_box").find(".input-group-btn").prev().val(Number(weight * 1000).toFixed(2));	
+								}				 
+								
+	                           }			
+							  if(This.next().find('.select_parameter_span').text() == "Thickness:"){
+								  if(thick < 5){
+									  This.next().find(".select_parameter option[value='<5mm']").attr("selected",true);
+				                       }  
+								  if(thick >= 5 && thick < 10){
+									  This.next().find(".select_parameter option[value='5-10mm']").attr("selected",true);
+								       }
+								  if(thick >= 10){
+									   This.next().find(".select_parameter option[value='10-20mm']").attr("selected",true);
+								       }
+								  This.next().find('.select_parameter').attr("disabled","disabled");
+								  This.siblings(".group_box").find(".input-group-btn").prev().val(level3Parameter);
+							  }	
+							  
+							  if(processSize == 0){
+								  This.siblings(".group_box").find(".input-group-btn").prev().val(1);
+							  }
+							  
+							  
+							  //只有板和扁钢可以折弯，3mm以上 建议100T
+							  if(level1 == 'Bending'){
+								  var thickness = $('#select_thickness').val();
+								  if(thickness > 3){
+									  This.next().find(".select_parameter option[value='100T']").attr("selected",true);  
+								  }
+							  }
+							  
+							  //如果是galvanizing，则给予提示
+							  if(level1 == 'Hot dip galvanizing' || level1 == 'Cold galvanizing'){
+								  This.next().next().find('.btn-control-div').prev().show();
+							  }else{
+								  This.next().next().find('.btn-control-div').prev().hide();
+							  }
+							  
+					       
+						  }else{
+							  easyDialog.open({
+					    		  container : {
+					    		    header : 'Prompt message',
+					    		    content : 'Query failed'
+					    		  },
+					    		  overlay : false,
+					    		  autoClose : 1000
+					    		}); 
+						  }
+					  
+					});
+		})
+		
+  	    
+	  		
+  	}
+
+
+
+
+
+
+ //添加到BOM界面
+ function add_BOM(orderDetailsId){
+  
+	//防止重复点击
+	$('#add_BOM').css({"background-color":"#666"}).attr("disabled","true");
+	 
+	 
+    var quoteId = $('#quoteId').val();	
+	var tl = $('.process_list').find("li").length;
+	var process = "";
+	for(var i=0;i<tl;i++){
+	  var level1 = $(".process_list li:eq("+i+")").find("select:eq(0)").val();	
+	  var level2 = $(".process_list li:eq("+i+")").find("select:eq(1)").val();	
+	  if($(".process_list li:eq("+i+")").find("div.model_label").css("display") == "none"){
+		  level2 = "";
+	  }	  
+
+	  var level3Parameter = $(".process_list li:eq("+i+")").find("input:last").val();
+ 	  var outsideSurface =$(".process_list li:eq("+i+")").find("input.outside").val();
+ 	  var insideSurface = $(".process_list li:eq("+i+")").find("input.inside").val();
+ 	  if(outsideSurface == 1 || insideSurface == 1){
+ 		 level3Parameter = $('div.outside').find("input:first").val();
+ 	  }
+	  if(level2 == "undefined"){
+			 level2 = "";
+	    }
+	  process += "-" + level1+"%"+ "-" + level2+"%"+ "-" + level3Parameter+"%"+ "-" + outsideSurface+"%"+ "-" + insideSurface+",";
+	}
+	if($(".process_list li:eq(0)").css("visibility") == "hidden" && tl == 1){
+  	  process = "";	
+  	}
+ 	  	
+	
+	 $.ajax({
+        	url:'saveProcessDetails.do',
+        	method:'post',
+        	data : {"process":process,
+        		    "orderDetailsId" : orderDetailsId
+        	       },
+			success : function(data) {
+				
+				$('#add_BOM').css({"background-color":"#5d9cec"}).removeAttr("disabled");   
+				
+				window.location.href = "/steelPlate/calculator/queryBom.do?quoteId="+quoteId;	
+			
+			},error:function(msg){
+				
+				$('#add_BOM').css({"background-color":"#5d9cec"}).removeAttr("disabled");   
+				easyDialog.open({
+		    		  container : {
+		    		    header : 'Prompt message',
+		    		    content : 'Save falied,please try again'
+		    		  },
+		    		  overlay : false,
+		    		  autoClose : 1000
+		    		}); 
+			}
+			
+        });
+	 
+   }
+   
+   
+   //编辑材料
+   function edit_goodsType(id){
+
+	window.location.href = "/steelPlate/calculator/toUpdateOrderDetails.do?orderDetailsId="+id;	
+	    	 
+   }
+   
+   
+ //根据材料类型查看标准参数
+   
+   function query_standard(){		
+		var goodsType = $(".plate i:eq(0)").html();
+		
+		
+		
+		 $.post(
+				 "/steelPlate/calculator/queryStandardByGoodsTypeId.do",
+					{
+					 "goodsType" : goodsType				    	       
+					},
+			function(result){	
+					    if(result.state == 0){
+					    	$('#DataTables_Table_0_wrapper').empty();
+					    	var goodsTypeNormals = result.data.goodsTypeNormals;
+					    	var list = result.data.list;
+					    	var tl = goodsTypeNormals.length;
+					    	var ul = "";
+					    	var title = "";		    	
+					    	
+					    	for(var i=0;i<tl;i++){
+					    		var li_tl = list[i].length;		
+					    		var li = "";
+					            var type = "";
+					    		for(var j=0;j<li_tl;j++){
+					    			var w = list[i][j].split(":");
+					    			var type1 = '<li>'+w[0]+'(mm)</li>';
+					    			var li1 = '<li>'+w[1]+'</li>';
+					    			type +=type1;
+					    			li +=li1;
+					    		}
+					    		
+					    		title = '<ul><h3 class="w-text">Choose the standard you need</h3></ul>'+
+					    		        '<ul>'+
+					    		        '<li>Type</li>'+type+
+					    		        '<li>Operation</li>'+
+					    		        '</ul>';
+					    		        
+					    		ul = '<ul>'+
+					    		     '<li>'+(goodsTypeNormals[i].parameterType == null ? '' : goodsTypeNormals[i].parameterType)+'</li>'+li+
+					    		     '<li><button onclick="select_standard('+goodsTypeNormals[i].id+')">select</button></li>'+
+					    		     '</ul>';	     
+						    	$('#DataTables_Table_0_wrapper').append(ul);			 	   
+					    	}
+					    	 $('#DataTables_Table_0_wrapper').find('ul:first').before(title);
+
+					    	 var s_tl = $('#DataTables_Table_0_wrapper').find('ul:eq(1)').find('li').length;
+							 var width = Math.floor(98/s_tl);
+							 $("#DataTables_Table_0_wrapper").find('li').css({"width":width + "%"});
+					    	 $('.wrapper').hide();
+					    	 $('#back_bom').hide();
+					    	 $('#show_orderDetails').show();
+					    	 $('.w-big-box').show();
+				    	    
+				    }else{
+				    	easyDialog.open({
+				    		  container : {
+				    		    header : 'Prompt message',
+				    		    content : 'No data was found'
+				    		  },
+				    		  autoClose : 1000
+				    		}); 
+				    }
+				    
+			   })  
+			
+	}
+	
+	//选择标准参数
+  function select_standard(standardId){
+	   $('#show_orderDetails').hide();
+ 	   $('.w-big-box').hide();
+	   $.post(
+				 "/steelPlate/calculator/queryByStandardId.do",
+					{
+					 "standardId" : standardId				    	       
+					},
+			function(result){	
+				    if(result.state == 0){
+				       $('#back_bom').show();
+				 	   $('.wrapper').show();
+				    	var parameter = result.data.parameterNormal;				    	
+				    	var s = parameter.split(",");
+			 			var tl = s.length;
+			             if(tl == 0){
+			             	return false;
+			             }         
+			 			$(".dimensions li").each(function(index, element) {
+			 				var type = $(this).find("span").html();
+			 				$(this).find("input").val();
+			                 for(var i=0;i<tl;i++){
+			                   var w = s[i].split(":");
+			                   if(w[0] == type){
+			                 	$(this).find("input").val(w[1]); 
+			                   }
+			                }				
+			                 if(type == 'Length'){
+				            	   $(this).find("input").focus(); 
+				               }  
+			 			})
+			 			//单位确认
+ 						if($("#select_unit").val() == "inch"){
+	 						$("#select_unit").change();
+ 						} 
+			 			 $('#show_orderDetails').hide();
+				    	
+				    }else{
+				    	easyDialog.open({
+				    		  container : {
+				    		    header : 'Prompt message',
+				    		    content : 'No data was found'
+				    		  },
+				    		  autoClose : 1000
+				    		}); 
+				    }
+				  
+			})		    
+  }
+
+	//处理显示
+	function show_orderDetails(){		
+		 $('.wrapper').show();
+    	 $('#back_bom').show();
+    	 $('#show_orderDetails').hide();
+    	 $('.w-big-box').hide();
+	}
+   
+   
+   
+     
+</script>
+<style>
+
+a:hover{cursor:pointer;}
+.w-big-box{margin: 0 auto;
+		  width: 980px;
+		  font-style: normal;}
+   #DataTables_Table_0_wrapper ul:last-child li{border-bottom:1px solid #CDCDCD;}
+   #DataTables_Table_0_wrapper li{width:30%; height:30px; float:left;white-space:nowrap;border-top: 1px solid #CDCDCD;border-left: 1px solid #CDCDCD;
+   text-align: center;
+  	line-height: 30px;} 
+  	.w-text{padding:10px;}
+      #DataTables_Table_0_wrapper ul:nth-of-type(2) li{background: #efefef;} 
+ 
+
+/* .wrapper{ display: block !important; } */
+.process_list li:first-child{
+display:block;
+}
+/* .process_list li:first-child  .fa-minus{ */
+/* display:none; */
+/* } */
+.process_list li:first-child .tips{
+visibility:visible;
+}
+.process_list li .tips{
+visibility:hidden;
+}
+.process_list li:first-child .add1{
+display:inline-block;
+}
+
+.process_list li .add1{
+display:none;
+}
+.process_list li{
+display:block;
+}
+.process_list .fa-minus{
+float:left;
+ margin-top: 4px;
+margin-left:-18px;
+}
+.process_list li {
+    width: 966px;
+}
+.outside{display:none;}
+.w-table{width:100%;}
+.w-table .w-th{text-align:left;color:#07a6e9;width:100px;}
+.w-table .w-td{font-size:14px;}
+.process{border: solid 1px #cdcdcd;}
+.process .tips{font-weight: bold;}
+.w-btn-danger {
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+    background-color: #da4f49;
+    background-repeat: repeat-x;
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+}
+.w-btn {
+    display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-color: #e6e6e6 #e6e6e6 #bfbfbf;
+    border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+    border-bottom-color: #b3b3b3;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffe6e6e6', GradientType=0);
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+    -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 1px 2px rgba(0,0,0,0.05);
+}
+.w-btn-danger:hover{
+    color: #fff;
+    background-color: #bd362f;
+}
+.process_list li{position: relative;width: 891px;}
+.process_list li .group_box .w-btn-delete{right: 10px;position: absolute;top: 0px;}
+
+.w-wrapper2{margin-top:20px;width: 1010px;}
+.w-item_box2{overflow-x: hidden;width:270px;}
+
+.sub_item li{width:100%;}
+.sub_item li span{width:100%;display:inline-block; white-space: nowrap; word-break: break-all;}
+.w_add{cursor: pointer;}
+</style>
+</head>
+<body>
+	<div class="wrapper w-wrapper2 location z-location" id="back_bom">
+			<a onclick="history.back()"><img src="images/back.jpg">Back</a>
+    </div>  
+    <div class="wrapper w-wrapper2 location z-location" style="display: none;" id="show_orderDetails">
+			<a onclick="show_orderDetails()"><img src="images/back.jpg">Back</a>
+    </div>  
+    <input type="hidden" value="${orderDetails.goodsTypeId}" id="good_type_id">
+    <div class="wrapper w-wrapper2" style="font-style: initial;margin-top:35px;">
+    <div class="w-email"> Email us : <a  href="mailto:rfq@csmfg.com">RFQ@csmfg.com</a></div>
+<input id="superficialArea" value="${orderDetails.superficialArea}" type="hidden">
+<input id="quoteId" value="${orderDetails.quoteId}" type="hidden">
+<input id="order_weight" value="${orderDetails.weight}" type="hidden">
+<input id="parameter" value='${orderDetails.parameterMm}' type="hidden">
+<input id="oneside_state" value='${orderDetails.insideOutsideState}' type="hidden">
+  <h2 class="title_h2">Select the process</h2>  
+  <div class="process">
+  	<div class="est_box">
+				<div>
+					<table class="w-table">
+                    <tbody>
+                    <tr>
+                        <th class="w-th">Material:</th>
+<!--                         <td class="w-td">Q235 Plate,&nbsp;&nbsp;&nbsp;width 1111 nm,&nbsp;&nbsp;&nbsp;thickness 2 mm</td> -->
+                        <td class="w-td">
+                        ${goodsType}&nbsp;${materialType},
+                        <%
+                        for (int m = 0; m < parameters.length; m++) {
+							String[] split2 = parameters[m].split(":");	
+							if(m < parameters.length-1){
+						%>
+						  &nbsp;&nbsp;&nbsp;<%=split2[0]%>&nbsp;<%=split2[1]%> mm,
+						<%			
+							}else{
+						%>
+						  &nbsp;&nbsp;&nbsp;<%=split2[0]%>&nbsp;<%=split2[1]%> mm
+						<%				
+						  }
+						if(split2[0].equals("thickness")){
+						%>
+						<input type="hidden" id="select_thickness" value="<%=split2[1]%>">
+						<%	
+						}
+						}	
+	                    %>
+                        </td>
+<!--                         <td class="w-td">thickness 2 mm</td> -->
+                    </tr>
+                    <tr>
+                    	<th class="w-th">Weight:</th>
+                        <td class="w-td"><fmt:formatNumber type="number" value="${orderDetails.weight * 1000}" maxFractionDigits="2"/>KG</td>
+                    </tr>
+                    <tr>
+                    	<th class="w-th">Part Name:</th>
+                        <td class="w-td">${orderDetails.partName}</td>
+                    </tr>
+                   </tbody>
+                </table>
+					
+				</div>
+   </div>
+  <span class="tips">Process:</span> 
+   <c:if test="${processDetails.size() == 0}">
+   <div class="w_add w_add_1"><a class="btn btn-primary add1 add_1">add</a><span class="add1">Add Processing</span></div>
+   </c:if>
+   <c:if test="${processDetails.size() != 0}">
+   <div class="w_add w_add_1" style="display:none;"><a class="btn btn-primary add1 add_1">add</a><span class="add1">Add Processing</span></div>
+   </c:if>
+    <ul class="process_list">   
+       <%      
+       for (int i = 0; i < processDetails.size(); i++) {
+	   %>  
+      <li style="display:inline-block;top:-18px;">
+      <input type="hidden" value="<%=processDetails.get(i).getLevel2Parameter()%>"/>	
+      <input type="hidden" value="<%=processDetails.get(i).getLevel3Parameter()%>"/>	
+
+					<div class="check_cont" style="display: block;">
+						<select name="select" class="form_select select_process">
+			              <%
+			                 List<ProcessInfo> processInfo = processInfos.get(i);
+                               for (int j = 0; j < list.size(); j++) {
+                                    if (processDetails.get(i).getLevel1Parameter().equals(list.get(j).getLevel1())) {	 
+                                      
+                               %>
+								    <option value="<%=list.get(j).getLevel1()%>" selected="selected"><%=list.get(j).getLevel1()%></option>
+								<%
+									}else if(list.get(j).getLevel1().equals("---Surface Treatment---")){
+							    %>
+									<option value="<%=list.get(j).getLevel1()%>" disabled="disabled"><%=list.get(j).getLevel1()%></option>
+								<%		
+									}else if(list.get(j).getLevel1().equals("Bending") && !(goodsType.equals("Plates") && !(goodsType.equals("Flat bar")))){
+							    %>
+									<option value="<%=list.get(j).getLevel1()%>" style="display:none;"><%=list.get(j).getLevel1()%></option>
+								<%		
+								    }else {
+								%>
+								<option value="<%=list.get(j).getLevel1()%>"><%=list.get(j).getLevel1()%></option>
+								<%
+							    	}
+								 }
+								%>
+						</select>
+						<div class="model_label">
+						    <span class="select_parameter_span"><%=list2.get(i).getLevel2Explain()%>:</span>				    	                          
+						   <div class="outside">  						
+								<div class="number_txt">
+							        <%
+										if (processDetails.get(i).getLevel3Parameter() != null && !"".equals(processDetails.get(i).getLevel3Parameter())) {
+									%>
+								   <input class="" value="<%=orderDetails.getSuperficialArea()%>" type="text"  disabled="true"> <span>m^2</span>
+								
+								    <%
+								       }else{
+								    %>
+								    <input class="" value="<%=orderDetails.getSuperficialArea()%>" type="text"> <span>m^2</span>
+								    <%	   
+								       }
+								    %>
+								</div>
+								<div class="group_box">
+									<div class="input-group">
+												<input class="form-control" value="one side"
+												disabled="disabled" type="text" /> 												
+											<%
+												if (processDetails.get(i).getOutsideSurface() == 1) {
+											%>
+											<input type="hidden" class="outside" value="1" />
+											<span class="fa fa-check cur"></span>							
+									       <%
+										     }else{
+										    	 
+										   %> 
+										  <input type="hidden" class="outside" value="0" />
+										  <span class="fa fa-check"></span>	 	 
+										   <%  	 
+										     }
+									       %>
+									</div>
+									<div class="input-group">
+										<input class="form-control" value="another side"
+											disabled="disabled" type="text" />
+										<%
+											if (processDetails.get(i).getInsideSurface() == 1) {
+										%>
+										 <input type="hidden" class="inside" value="1" />
+										<span class="fa fa-check cur"></span>					
+									    <%
+										 } else {
+									    %>
+									   <input type="hidden" class="inside" value="0" />
+									   <span class="fa fa-check"></span>							
+							      	  <%
+								       }
+								      %>
+									</div>
+								</div>
+							</div>
+							
+							
+                            <%
+                             if(!(processDetails.get(i).getLevel2Parameter() == null || "".equals(processDetails.get(i).getLevel2Parameter()))){                           
+                            %>
+                            <select name="select" class="form_select select_parameter">
+							  <%
+                               for (int n = 0; n < processInfo.size(); n++) {
+                                     if (processDetails.get(i).getLevel2Parameter().equals(processInfo.get(n).getLevel2())) {	 
+                                      
+                               %>
+								<option value="<%=processDetails.get(i).getLevel2Parameter()%>" selected="selected"><%=processDetails.get(i).getLevel2Parameter()%></option>
+							   <%
+									} else {
+								%>
+								<option value="<%=processInfo.get(n).getLevel2()%>"><%=processInfo.get(n).getLevel2()%></option>
+								<%		
+									}
+                                  }   	 
+							   %>
+							</select>
+                            <%	                              
+                             }else{                          	 
+                           	%> 	
+                           	  <select name="select" class="form_select select_parameter" style="display:none"></select>
+                           	<% 
+                             }
+                            %>
+							
+						</div>
+						<div class="group_box">
+						        
+						        <div class="input-group">
+									<input class="form-control" type="text" value="<%=processDetails.get(i).getLevel3Parameter()%>"> <span
+										class="input-group-btn"><%=processInfo.get(0).getLevel3()%></span>	
+								</div>
+								<span style="display:none;color:red;">(Cost is correlated to weight)</span>
+							&#12288; 
+							<div class="btn-control-div" style="border: solid 2px #ff7f27;display:inline-block;width: 18px;height: 18px;border-radius: 50%;top: 5px;right: 100px;position: absolute;">
+							     <span class="btn-control-num" style="height: 18px;line-height: 18px;display:block;color: #ff7f27;text-align:center;"><%=i+1%></span>
+							</div>
+							<a href="#" class="w-btn-delete"><button class="w-btn w-btn-danger" style="margin-left: 10px;">Delete</button></a> 
+						</div>						
+					</div>
+				</li>
+	 <%
+	   } 
+       if(processDetails.size() == 0){    	   
+	 %>
+
+	 <li style="visibility: hidden;top:-18px;">
+<!-- 	 <input type="hidden" value=''/> -->
+<!-- 	 <input type="hidden" value=''/> -->
+					<div class="check_cont" style="display: block;">
+						<select name="select" class="form_select select_process">
+							<c:forEach var="obj" items="${processInfos}" varStatus="i">
+								<option value="${obj.level1}"
+								<c:if test="${obj.level1 eq '---Surface Treatment---'}"> disabled="disabled"</c:if>
+								<c:if test="${ obj.level1 == 'Bending'&& (goodsType != 'Plates') && (goodsType != 'Flat bar')}">style="display:none;"</c:if>>
+								${obj.level1}
+								</option>
+							</c:forEach>
+						</select>
+						<div class="model_label" style="display:none;">
+							<span class="select_parameter_span">Machine tonnage:</span>
+
+							<div class="outside">
+								<div class="number_txt">
+									<input class="" value="${orderDetails.superficialArea}"
+										type="text" disabled="true"> <span>m^2</span>
+								</div>
+								<div class="group_box">
+									<div class="input-group">
+										<input class="form-control" value="one side"
+											disabled="disabled" type="text" /> <input type="hidden"
+											class="outside" value="0" /> <span class="fa fa-check"></span>
+									</div>
+									<div class="input-group">
+										<input class="form-control" value="another side"
+											disabled="disabled" type="text" /> <input type="hidden"
+											class="inside" value="0" /> <span class="fa fa-check"></span>
+									</div>
+								</div>
+							</div>
+
+							<select name="select" class="form_select select_parameter">
+								<c:forEach var="obj" items="${list}" varStatus="i">
+									<option value="${obj.level2 }">${obj.level2 }</option>
+								</c:forEach>
+							</select>
+						</div>
+						<div class="group_box">
+							<div class="input-group">
+								<input class="form-control" type="text" value="1"> <span
+									class="input-group-btn">times</span>
+							</div>
+							<span style="display:none;color:red;">(Cost is correlated to weight)</span>
+							&#12288; 
+							<div class="btn-control-div" style="border: solid 2px #ff7f27;display:inline-block;width: 18px;height: 18px;border-radius: 50%;top: 5px;right: 100px;position: absolute;">
+							     <span class="btn-control-num" style="height: 18px;line-height: 18px;display:block;color: #ff7f27;text-align:center;">1</span>
+							</div>
+							<a href="#" class="w-btn-delete"><button class="w-btn w-btn-danger" style="margin-left: 10px;">Delete</button></a> 
+					</div>
+			</div>
+	</li>
+	<%
+       }
+	%>
+    </ul> 
+         <c:if test="${processDetails.size() > 0}">
+         <div class="w_add w_add_2" style="left: 80px;top: -15px;"><a class="btn btn-primary add1 add_1">add</a><span class="add1">Add Processing</span></div>
+          </c:if>
+         <c:if test="${processDetails.size() == 0}">
+         <div class="w_add w_add_2" style="left: 80px;top: -15px;display:none;"><a class="btn btn-primary add1 add_1">add</a><span class="add1">Add Processing</span></div>
+          </c:if>
+<!--     <div><a class="btn btn-primary add1 add_1">add</a><span>(Add Processing  punching, bending, welding, cutting...)</span></div> -->
+  </div>
+<!--   <div><a class="btn btn-primary add1 add_1">add</a><span>(Add Processing)</span></div> -->
+<!--   <div class="panel"> -->
+<!--     <p><span>Qty per set:</span> -->
+<!--       <input type="text" placeholder="can be left blank"  class="form-control"/> -->
+<!--     </p> -->
+<!--     <p><span> Total Setes:</span> -->
+<!--       <input type="text" placeholder="required" class="form-control" id="Setes"/> -->
+<!--     </p> -->
+    <a class="btn btn-primary" style="float: right;margin-top:30px;" id="add_BOM" onclick="add_BOM('${orderDetails.id}')" href="#">update process to BOM</a>
+<!--   </div> -->
+</div>
+	<div class="wrapper w-wrapper2" style="display: block;position: relative;top: 40px;">
+		
+		<input value="${orderDetails.id}" type="hidden" id="orderDetailsId">
+		<input value="${goodsTypeInfo.parameter}" type="hidden" id="parameter1">
+				<h2 class="title_h2">Calculate the first part(you can add moreparts later)</h2>
+				<div class="choose_box">
+						<div class="item_box">
+								<h3 class="title_h3">Choose the material:</h3>
+								<ul class="item_list father_product">
+								<%
+								for (int i = 0; i < goodsTypeInfos.size(); i++) {
+									  if(goodsTypeInfos.get(i).getGoodsType().equals(goodsTypeInfo.getGoodsType())){
+								%>
+								<li class="active"><span><%=goodsTypeInfos.get(i).getGoodsType()%></span><input value="<%=goodsTypeInfos.get(i).getParameter()%>" type="hidden"><em class="fa fa-fw"></em></li>								
+							         <%  
+								     }else{
+								     %>
+                                     <li><span><%=goodsTypeInfos.get(i).getGoodsType()%></span><input value="<%=goodsTypeInfos.get(i).getParameter()%>" type="hidden"><em class="fa fa-fw"></em></li>								
+								     <%	 
+								     }
+								}
+								%>
+								</ul>
+						</div>
+						<div class="item_box w-item_box2">
+								<h3 class="title_h3">&nbsp;</h3>
+								<ul class="item_list sub_item">
+								<%
+								for (int i = 0; i < materialInfos.size(); i++) {
+									  if(materialInfos.get(i).getMaterialType().equals(materialInfo.getMaterialType())){
+								%>
+                                <li class="active"><span><%=materialInfos.get(i).getMaterialType()%></span></li>     
+                                     <%
+									  }else{
+									 %>	 
+									  <li>
+									  <span><%=materialInfos.get(i).getMaterialType()%></span>								 						  
+									  </li> 
+									  <% 
+								     }
+								}
+								%>
+								</ul>
+						</div>
+						<div class="item_box" style="margin-top: 83px;">
+					           <div class="unit z-unit">
+										Unit <select name="select" class="form_select" id="select_unit">
+												<option value="mm">mm</option>
+												<option value="inch">inch</option>
+										</select>
+								</div>
+								<div class="z-unit">
+										Standard:<br>
+										<a style="color: #08c; text-decoration: underline;" onclick="query_standard()">view the regular sizes</a>
+								</div>
+								<h3 class="title_h3 z-title-h3" >Dimensions:</h3>
+								<ul class="item_list dimensions"> 
+								<% 
+								for (int m = 0; m < parameters.length; m++) {
+						            String[] split2 = parameters[m].split(":");
+						        %>
+                                   <li class="txt_li"><span><%=split2[0]%></span>
+								    <div class="input-group"> 
+									  <input class="form-control" type="text" value="<%=split2[1]%>"> 
+									  <span class="input-group-btn"> mm</span>
+									  <input type="hidden" value="<%=split2[1]%>">
+								   </div> 
+								  </li>
+								<%
+								}
+								%>  
+								</ul>
+						</div>
+						<div class="item_box_img" style="margin-top: 84px;">
+								<img src="${goodsTypeInfo.goodsImage}" /> <a href="#">View th material
+										detail</a>					
+								<p>
+										<span>Part Name:</span> <input type="text" id="partName"  value="${orderDetails.partName}"
+												placeholder="can be left blank" />
+								</p>
+								<p>
+										<span>Qty per set:</span> <input type="text" id="quantity" placeholder="" class="form-control" value="${orderDetails.goodsSet}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+								</p>
+						</div>
+				</div>
+				<div class="plate" style="position: absolute; top: 54px;right: 1px;width: 483px;">
+						<strong style="font-size:14px;padding-left: 18px;">What you have chosen is:</strong><em style="width:100%;"><i>${goodsTypeInfo.goodsType}</i>/<i>${materialInfo.materialType}</i></em>
+<%-- 						<em><span>${price}</span> <span class="input-group-btn"> USD/Ton</span></em> --%>
+							<em><i class="form-control-price" style="font-size: 20px;">${price}</i>&nbsp;&nbsp;	
+							<select id="select_currency">
+							  <c:forEach var="obj" items="${amountUnits}" varStatus="i">							    
+							    <option value="${obj.currencyShorthand}" <c:if test="${clientOrder.amountUnit == obj.id}">selected</c:if>>${obj.currencyShorthand}/TON</option>							    
+							  </c:forEach>
+							</select>
+							</em>
+							<em><i>Updated On：</i><i>${materialInfos.get(0).updateDate}</i></em>
+				</div>
+				<div class="btn_box" style="float:right;">
+						<input type="submit" value="update the material" id="sub1"
+								class="btn btn-primary" />
+				</div>
+		</div>
+<div class="w-big-box" style="display:none;">
+    <div class="container-fluid">
+       <div class="row-fluid">
+            <div class="span12">
+                <div class="w-widget-box">
+
+                    <div class="w-widget-content nopadding">
+                        <div id="DataTables_Table_0_wrapper" role="grid">
+                                <ul>
+                                  <li></li>
+                                </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+</div>		
+		
+		
+
+</body>
+</html>

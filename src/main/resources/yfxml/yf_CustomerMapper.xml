@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.CustomerMapper">
+	<resultMap id="customerResultMap" type="com.yf.bean.Customer">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="shipping" property="shipping" jdbcType="VARCHAR" />
+		<result column="containersNumber" property="containersNumber"
+			jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="FLOAT" />
+		<result column="volume" property="volume" jdbcType="FLOAT" />
+		<result column="otherService" property="otherService" jdbcType="VARCHAR" />
+		<result column="otherComments" property="otherComments"
+			jdbcType="VARCHAR" />
+		<result column="dealStatus" property="dealStatus" jdbcType="INTEGER" />
+		<result column="createTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="trafficType" property="trafficType" jdbcType="VARCHAR" />
+		<result column="selectRecords" property="selectRecords"
+			jdbcType="VARCHAR" />
+		<result column="lastFollowUpUserName" property="lastFollowUpUserName"
+			jdbcType="VARCHAR" />
+		<result column="lastFollowUptime" property="lastFollowUptime"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="customerColumnList">
+		id,email,shipping, containersNumber,weight,
+		volume,otherService,otherComments,
+		dealStatus,createTime,trafficType,selectRecords,
+		lastFollowUpUserName,lastFollowUptime
+	</sql>
+
+	<select id="queryById" resultMap="customerResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="customerColumnList" />
+		from freight_customer
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<insert id="insert" parameterType="com.yf.bean.Customer">
+		insert into freight_customer (
+		email,shipping, containersNumber,weight,
+		volume,otherService,otherComments, dealStatus,
+		createTime,trafficType,selectRecords,
+		lastFollowUpUserName,lastFollowUptime)
+		values (
+		#{email,jdbcType=VARCHAR}, #{shipping,jdbcType=VARCHAR},
+		#{containersNumber,jdbcType=INTEGER},
+		#{weight,jdbcType=FLOAT},
+		#{volume,jdbcType=FLOAT},
+		#{otherService,jdbcType=VARCHAR},
+		#{otherComments,jdbcType=VARCHAR},
+		#{dealStatus,jdbcType=INTEGER},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{trafficType,jdbcType=VARCHAR},#{selectRecords,jdbcType=VARCHAR},
+		#{lastFollowUpUserName,jdbcType=VARCHAR},#{lastFollowUptime,jdbcType=TIMESTAMP})
+	</insert>
+
+</mapper>

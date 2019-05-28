@@ -1,0 +1,1062 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>China Sea Air - Freight</title>
+<link type='image/x-ico' rel='icon' href='/freight/img/chinaseaair.ico' />
+<script type="text/javascript" src="/freight/js/jquery1.10.min.js"></script>
+<script type="text/javascript" src="/freight/js/page.js"></script>
+<link type="text/css" rel="stylesheet" href="/freight/css/style.css">
+<link rel="stylesheet" type="text/css" href="/freight/css/easyui.css">
+<script type="text/javascript" src="/freight/js/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/freight/js/cbpFWTabs.js"></script>
+<script type="text/javascript" src="/freight/js/index.js"></script>
+<script type="text/javascript">
+	var fclDeparturePort = [];//整箱海运出发港口数据
+	var fclDestinationPort = [];//整箱海运出发港口数据
+	var lclDeparturePort = [];//拼箱海运出发港口数据
+	var lclDestinationPort = [];//拼箱海运目的港口数据
+	var kongyunDoctorData = [];//空运出发港口数据
+	var kongyunDesData = [];//空运目的港口数据
+	var kuaiyunData = [];//快邮目的国家数据
+	$(function() {
+		$("#loadImgDiv").show();
+		$(document).keyup(
+				function(event) {
+					if (event.keyCode == 13) {
+						var $li = $(".tabs nav ul li");
+						if ($li.eq(0).hasClass("tab-current")) {
+							var qidian = $(".combobox-item-selected").find(
+									"#aaa").text();
+							var zhongdian = $(".combobox-item-selected").find(
+									"#bbb").text();
+							if (!(qidian == null || qidian == ""
+									|| zhongdian == null || zhongdian == "")) {
+								divshow(1, 1);
+							}
+						} else if ($li.eq(1).hasClass("tab-current")) {
+							var qidian = $(".combobox-item-selected").find(
+									"#ccc").text();
+							var zhongdian = $(".combobox-item-selected").find(
+									"#ddd").text();
+							if (!(qidian == null || qidian == ""
+									|| zhongdian == null || zhongdian == "")) {
+								divshow(2, 1);
+							}
+						} else if ($li.eq(2).hasClass("tab-current")) {
+							var qidian = $(".combobox-item-selected").find(
+									"#hhh").text();
+							var zhongdian = $(".combobox-item-selected").find(
+									"#fff").text();
+							if (!(qidian == null || qidian == ""
+									|| zhongdian == null || zhongdian == "")) {
+								divshow(3, 1);
+							}
+
+						} else if ($li.eq(3).hasClass("tab-current")) {
+							var countryid = $(".combobox-item-selected").find(
+									"#iii").text();
+							if (!(countryid == "" || countryid == null)) {
+								divshow(4, 1);
+							}
+						}
+					}
+				});
+
+		//整箱海运起始港口
+		$('#aa')
+				.combobox(
+						{
+							valueField : "enportname",
+							textField : "enportname",
+							data : fclDeparturePort,
+							formatter : function(row) {
+								return '<span id="aaa" class="item-text" style="display:none">'
+										+ row.id
+										+ '</span>'
+										+ '<span class="item-text">'
+										+ row.enportname + '</span>';
+							},
+							onChange : function(newValue, oldValue) {
+								if (newValue != null || $.trim(newValue) != "") {
+									var nwdata = [];
+									for (var i = 0; i < fclDeparturePort.length; i++) {
+										if (fclDeparturePort[i].enportname
+												.indexOf(newValue.toUpperCase()) == 0
+												|| fclDeparturePort[i].chportname
+														.indexOf(newValue) == 0) {
+											nwdata.push(fclDeparturePort[i]);
+										}
+									}
+									$(this).combobox("loadData", nwdata);
+								} else {
+									$(this).combobox("loadData",
+											fclDeparturePort);
+								}
+							},
+							onLoadSuccess : function(data) {
+								var orgCount = data.length;
+								if (orgCount > 6) {
+									$(this).combobox('panel').height(156);
+								} else if (orgCount > 1) {
+									$(this).combobox('panel').height(
+											26 * orgCount);
+								} else {
+									$(this).combobox('panel').height(26);
+								}
+							}
+						});
+
+		//整箱海运目的港口
+		$('#bb')
+				.combobox(
+						{
+							valueField : "enportname",
+							textField : "enportname",
+							data : fclDestinationPort,
+							formatter : function(row) {
+								return '<span id="bbb" style="display:none">'
+										+ row.id + '</span>'
+										+ '<span class="item-text">'
+										+ row.enportname + '</span>';
+							},
+							onChange : function(newValue, oldValue) {
+								if (newValue != null || $.trim(newValue) != "") {
+									var nwdata = [];
+									for (var i = 0; i < fclDestinationPort.length; i++) {
+										if (fclDestinationPort[i].enportname
+												.indexOf(newValue.toUpperCase()) == 0
+												|| fclDestinationPort[i].chportname
+														.indexOf(newValue) == 0) {
+											nwdata.push(fclDestinationPort[i]);
+										}
+									}
+									$(this).combobox("loadData", nwdata);
+								} else {
+									$(this).combobox("loadData",
+											fclDestinationPort);
+								}
+							},
+							onLoadSuccess : function(data) {
+								var orgCount = data.length;
+								if (orgCount > 6) {
+									$(this).combobox('panel').height(156);
+								} else if (orgCount > 1) {
+									$(this).combobox('panel').height(
+											26 * orgCount);
+								} else {
+									$(this).combobox('panel').height(26);
+								}
+							}
+						});
+
+		//拼箱海运起始港口
+		$('#cc')
+				.combobox(
+						{
+							valueField : "enportname",
+							textField : "enportname",
+							data : lclDeparturePort,
+							formatter : function(row) {
+								return '<span id="ccc" class="item-text" style="display:none">'
+										+ row.id
+										+ '</span>'
+										+ '<span class="item-text">'
+										+ row.enportname + '</span>';
+							},
+							onChange : function(newValue, oldValue) {
+								if (newValue != null || $.trim(newValue) != "") {
+									var nwdata = [];
+									for (var i = 0; i < lclDeparturePort.length; i++) {
+										if (lclDeparturePort[i].enportname
+												.indexOf(newValue.toUpperCase()) == 0
+												|| lclDeparturePort[i].chportname
+														.indexOf(newValue) == 0) {
+											nwdata.push(lclDeparturePort[i]);
+										}
+									}
+									$(this).combobox("loadData", nwdata);
+								} else {
+									$(this).combobox("loadData",
+											lclDeparturePort);
+								}
+							},
+							onLoadSuccess : function(data) {
+								var orgCount = data.length;
+								if (orgCount > 6) {
+									$(this).combobox('panel').height(156);
+								} else if (orgCount > 1) {
+									$(this).combobox('panel').height(
+											26 * orgCount);
+								} else {
+									$(this).combobox('panel').height(26);
+								}
+							}
+						});
+
+		//拼箱海运目的港口
+		$('#dd')
+				.combobox(
+						{
+							valueField : "enportname",
+							textField : "enportname",
+							data : lclDestinationPort,
+							formatter : function(row) {
+								return '<span id="ddd" style="display:none">'
+										+ row.id + '</span>'
+										+ '<span class="item-text">'
+										+ row.enportname + '</span>';
+							},
+							onChange : function(newValue, oldValue) {
+								if (newValue != null || $.trim(newValue) != "") {
+									var nwdata = [];
+									for (var i = 0; i < lclDestinationPort.length; i++) {
+										if (lclDestinationPort[i].enportname
+												.indexOf(newValue.toUpperCase()) == 0
+												|| lclDestinationPort[i].chportname
+														.indexOf(newValue) == 0) {
+											nwdata.push(lclDestinationPort[i]);
+										}
+									}
+									$(this).combobox("loadData", nwdata);
+								} else {
+									$(this).combobox("loadData",
+											lclDestinationPort);
+								}
+							},
+							onLoadSuccess : function(data) {
+								var orgCount = data.length;
+								if (orgCount > 6) {
+									$(this).combobox('panel').height(156);
+								} else if (orgCount > 1) {
+									$(this).combobox('panel').height(
+											26 * orgCount);
+								} else {
+									$(this).combobox('panel').height(26);
+								}
+							}
+						});
+
+		/* $('#ee').numberbox({
+			min : 0,
+			precision : 2
+		});
+
+		$('#gg').numberbox({
+			min : 0,
+			precision : 2
+		}); 
+		 */
+		//空运起始港口
+		$('#hh')
+				.combobox(
+						{
+							valueField : "airportCode",
+							textField : "airportCode",
+							data : kongyunDoctorData,
+							formatter : function(row) {
+								return '<span id="hhh" style="display:none">'
+										+ row.id
+										+ '</span><span class="item-text">'
+										+ row.airportCode
+										+ '</span>--</span><span class="item-text">'
+										+ row.enCityName + '</span>';
+							},
+							onChange : function(newValue, oldValue) {
+								if (newValue != null && $.trim(newValue) != "") {
+									var nwData = [];
+									for (var i = 0; i < kongyunDoctorData.length; i++) {
+										var cityLocal = kongyunDoctorData[i].enCityName
+												.indexOf(newValue.toUpperCase());
+										var codeLocal = kongyunDoctorData[i].airportCode
+												.indexOf(newValue.toUpperCase());
+										if ((cityLocal != -1 && cityLocal < 1)
+												|| (codeLocal != -1 && codeLocal < 1)) {
+											nwData.push(kongyunDoctorData[i]);
+										}
+									}
+									$(this).combobox("loadData", nwData);
+
+								} else {
+									$(this).combobox("loadData",
+											kongyunDoctorData);
+								}
+							},
+							onLoadSuccess : function(data) {
+								var orgCount = data.length;
+								if (orgCount > 6) {
+									$(this).combobox('panel').height(156);
+								} else if (orgCount > 1) {
+									$(this).combobox('panel').height(
+											26 * orgCount);
+								} else {
+									$(this).combobox('panel').height(26);
+								}
+							}
+						});
+
+		//空运目的港口
+		$('#ff').combobox(
+				{
+					valueField : "airportCode",
+					textField : "airportCode",
+					data : kongyunDesData,
+					formatter : function(row) {
+						return '<span id="fff" style="display:none">' + row.id
+								+ '</span><span class="item-text">'
+								+ row.airportCode
+								+ '</span>--<span class="item-text">'
+								+ row.enCityName + '</span>';
+					},
+					onChange : function(newValue, oldValue) {
+						if (newValue != null && $.trim(newValue) != "") {
+							var nwData = [];
+							for (var i = 0; i < kongyunDesData.length; i++) {
+								var cityLocal = kongyunDesData[i].enCityName
+										.indexOf(newValue.toUpperCase());
+								var codeLocal = kongyunDesData[i].airportCode
+										.indexOf(newValue.toUpperCase());
+								if ((cityLocal != -1 && cityLocal < 1)
+										|| (codeLocal != -1 && codeLocal < 1)) {
+									nwData.push(kongyunDesData[i]);
+								}
+							}
+							$(this).combobox("loadData", nwData);
+
+						} else {
+							$(this).combobox("loadData", kongyunDesData);
+						}
+					},
+					onLoadSuccess : function(data) {
+						var orgCount = data.length;
+						if (orgCount > 6) {
+							$(this).combobox('panel').height(156);
+						} else if (orgCount > 1) {
+							$(this).combobox('panel').height(26 * orgCount);
+						} else {
+							$(this).combobox('panel').height(26);
+						}
+					}
+				});
+
+		//快邮目的国家
+		$('#ii').combobox(
+				{
+					valueField : "country",
+					textField : "country",
+					data : kuaiyunData,
+					formatter : function(row) {
+						return '<span id="iii" style="display:none">' + row.id
+								+ '</span>' + '<span class="item-text">'
+								+ row.country + '</span>';
+					},
+					onChange : function(newValue, oldValue) {
+						if (newValue != null && $.trim(newValue) != "") {
+							var nwData = [];
+							for (var i = 0; i < kuaiyunData.length; i++) {
+								if (kuaiyunData[i].country.indexOf(newValue
+										.toUpperCase()) == 0
+										|| kuaiyunData[i].chinapostbig
+												.indexOf(newValue) == 0) {
+									nwData.push(kuaiyunData[i]);
+								}
+							}
+							$(this).combobox("loadData", nwData);
+
+						} else {
+							$(this).combobox("loadData", kuaiyunData);
+						}
+					},
+					onLoadSuccess : function(data) {
+						var orgCount = data.length;
+						if (orgCount > 6) {
+							$(this).combobox('panel').height(156);
+						} else if (orgCount > 1) {
+							$(this).combobox('panel').height(26 * orgCount);
+						} else {
+							$(this).combobox('panel').height(26);
+						}
+					}
+				});
+
+		$('#jj').numberbox({
+			min : 0,
+			precision : 2
+		});
+		$('#qq').numberbox({
+			min : 0,
+			precision : 2
+		});
+
+		$('#aa').next().find('.textbox-text').attr("placeholder", "Enter Port");
+		$('#bb').next().find('.textbox-text').attr("placeholder", "Enter Port");
+		$('#cc').next().find('.textbox-text').attr("placeholder", "Enter Port");
+		$('#dd').next().find('.textbox-text').attr("placeholder", "Enter Port");
+		$('#ii').next().find('.textbox-text').attr("placeholder", "Enter Port");
+		$('#hh').next().find('.textbox-text').attr("placeholder",
+				"Enter City or Port");
+		$('#ff').next().find('.textbox-text').attr("placeholder",
+				"Enter City or Port");
+
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("trafficType", "");
+		sessionStorage.setItem("showRecords", "");
+		sessionStorage.setItem("selectRecords", "");
+	});
+
+	function selectDepCity(num, city) {
+		if (num == 1) {
+			$("#aa").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#aaa").text();
+			var zhongdian = $(".combobox-item-selected").find("#bbb").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(1, 1);
+			}
+		} else if (num == 2) {
+			$("#cc").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#ccc").text();
+			var zhongdian = $(".combobox-item-selected").find("#ddd").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(2, 1);
+			}
+		} else if (num == 3) {
+			$("#hh").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#hhh").text();
+			var zhongdian = $(".combobox-item-selected").find("#fff").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(3, 1);
+			}
+		}
+
+	}
+
+	function selectDesCity(num, city) {
+
+		if (num == 1) {
+			$("#bb").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#aaa").text();
+			var zhongdian = $(".combobox-item-selected").find("#bbb").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(1, 1);
+			}
+		} else if (num == 2) {
+			$("#dd").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#ccc").text();
+			var zhongdian = $(".combobox-item-selected").find("#ddd").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(2, 1);
+			}
+		} else if (num == 3) {
+			$("#ff").combobox("select", city);
+			var qidian = $(".combobox-item-selected").find("#hhh").text();
+			var zhongdian = $(".combobox-item-selected").find("#fff").text();
+			if (!(qidian == null || qidian == "" || zhongdian == null || zhongdian == "")) {
+				divshow(3, 1);
+			}
+		}
+	}
+
+	function Contactus() {
+		var sessionStorage = window.sessionStorage;
+		sessionStorage.setItem("trafficType", "");
+		sessionStorage.setItem("showRecords", "");
+		sessionStorage.setItem("selectRecords", "");
+		window.location.href = "/freight/Contactus.html";
+	}
+	
+	window.onload = function() {
+		loadFclData();
+		$("#loadImgDiv").hide();
+	}
+</script>
+
+<style>
+body {
+	margin: 0 0;
+	padding: 0 0;
+	font: normal 100% Helvetica, Arial, sans-serif;
+	　　
+}
+
+h1 {
+	font-size: 1.5em;
+}
+
+html, nav, div, img {
+	padding: 0 0;
+	margin: 0 0;
+}
+
+small {
+	font-size: 0.875em;
+	　　
+}
+
+img {
+	width: 100%;
+}
+
+.mind_1 {
+	width: 100%;
+	height: 350px;
+	background: url(/freight/img/mind_1bj.jpg) repeat-x;
+	display: inline-block;
+	position: relative;
+}
+
+.tabs nav {
+	position: absolute;
+	margin-top: -160px;
+	width: 800px;
+}
+
+.item-img {
+	display: inline-block;
+	vertical-align: middle;
+	width: 16px;
+	height: 16px;
+}
+
+.item-text {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 3px 0 3px 3px;
+}
+
+.headline-show {
+	color: #c3c3c3;
+}
+
+.pageGro {
+	padding: 15px 20px;
+	text-align: left;
+	color: #ccc;
+}
+
+.pageGro a {
+	display: inline-block;
+	color: #428bca;
+	display: inline-block;
+	height: 20px;
+	line-height: 20px;
+	padding: 0 5px;
+	border: 1px solid #ddd;
+	margin: 0 2px;
+	border-radius: 4px;
+	text-decoration: none;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+.pageGro a:hover {
+	text-decoration: none;
+	border: 1px solid #428bca;
+}
+
+.pageGro span.current {
+	display: inline-block;
+	height: 25px;
+	line-height: 25px;
+	padding: 0 10px;
+	margin: 0 2px;
+	color: #fff;
+	background-color: #428bca;
+	border: 1px solid #428bca;
+	border-radius: 4px;
+	vertical-align: middle;
+}
+
+.pageGro span.disabled {
+	display: inline-block;
+	height: 20px;
+	line-height: 20px;
+	padding: 0 5px;
+	margin: 0 2px;
+	color: #bfbfbf;
+	background: #f2f2f2;
+	border: 1px solid #bfbfbf;
+	border-radius: 4px;
+	vertical-align: middle;
+	font-size: 18px;
+}
+
+.combo-text {
+	width: 150px !important;
+	height: 32px !important;
+}
+
+.combo {
+	width: 166px !important;
+	height: 28px !important;
+	border-radius: 0px;
+	border: 1px solid #8c8c8c;
+}
+
+.combobox-item-hover {
+	background-color: #d5d5d5;
+	cursor: pointer;
+}
+
+.tabs {
+	width: 100%;
+}
+
+.sanjiao1, .sanjiao2, .sanjiao3, .sanjiao4 {
+	width: 0px;
+	height: 0px;
+	border-left: 30px solid transparent;
+	border-right: 30px solid transparent;
+	border-bottom: 25px solid white;
+	position: absolute;
+}
+
+.sanjiao1 {
+	top: -20px;
+	left: 55px;
+}
+
+.sanjiao2 {
+	top: -20px;
+	left: 255px;
+}
+
+.sanjiao3 {
+	top: -20px;
+	left: 455px;
+}
+
+.sanjiao4 {
+	top: -20px;
+	left: 655px;
+}
+
+.volu {
+	float: left;
+	margin-left: 20px;
+	overflow: hidden;
+}
+
+#section-circlefill-3 {
+	padding: 1em 0 !important;
+}
+
+.visapem {
+	color: #ff3f00;
+}
+
+.visible-left p {
+	width: 33%;
+	float: left;
+}
+
+#ee, #zz, #gg, #jj, #qq {
+	float: left;
+	line-height: 32px;
+	border: 1px #95B8E7 solid;
+}
+
+.combo {
+	z-index: 99;
+}
+
+.tabs nav ul {
+	display: block;
+}
+
+.tabs li span {
+	margin-top: -10px;
+}
+
+.tabs li span em {
+	float: left;
+	height: 20px;
+	line-height: 20px;
+	font-size: 16px;
+	font-style: initial;
+}
+
+.tabs li span img {
+	width: 20px;
+	float: left;
+	margin-top: 0px;
+}
+
+.bains {
+	margin-right: 10px;
+}
+
+.content-wrap {
+	clear: both;
+	width: 100%;
+}
+
+#section-circlefill-4 {
+	width: 100%;
+}
+
+.tank_bj {
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	opacity: 0.8;
+	position: fixed;
+	left: 0;
+	right: 0px;
+	bottom: 0px;
+	right: 0px;
+	z-index: 101;
+}
+
+.tank_search {
+	position: fixed;
+	left: 45%;
+	top: 45%;
+	z-index: 102;
+}
+</style>
+</head>
+
+<body>
+	<div id="searchImgDiv" style="display: none;">
+		<div class="tank_bj"></div>
+		<div class="tank_search">
+			<img src="/freight/img/search.gif">
+		</div>
+	</div>
+	<div id="loadImgDiv" style="display: none;">
+		<div class="tank_bj"></div>
+		<div class="tank_search">
+			<img src="/freight/img/loading.gif">
+		</div>
+	</div>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><img
+					src="/freight/img/logo_2.png" style="margin-top: 10px"></a>
+				<ul class="navbar-nav">
+					<li><a href="/freight/index.html" class="active">Home</a></li>
+					<li><a href="/freight/Aboutus.html">About us</a></li>
+					<li><a href="/freight/Contactus.html" class="dropdown-toggle"
+						data-toggle="dropdown"> Contact us<b class="caret"></b>
+					</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!--以上为head部分-->
+	<div class="wrap">
+		<div class="chun"></div>
+		<div class="tips">
+
+			<p style="font-size: 22px;">
+				We offer one-stop hassle-free <em>shipping service from China
+					at great shipping prices.</em>
+			</p>
+			<p style="color: #ffbf5e;">You may also benefit from our trade
+				related services such as pre-shipment inspection.</p>
+		</div>
+	</div>
+	<section class="mind">
+		<div class="mind_bj">
+			<div class="container tab_bj">
+				<div class="tabs tabs-style-circlefill">
+					<nav>
+						<ul>
+							<li><a href="#section-circlefill-1"
+								onclick='changePageGro(1)'><img src="/freight/img/ky_1.png"><span><img
+										src="/freight/img/jiant.png"><em>FCL Shipping</em></span></a></li>
+							<li><a href="#section-circlefill-2"
+								onclick='changePageGro(2)'><img src="/freight/img/ky_2.png"><span><img
+										src="/freight/img/jiant.png"><em>LCL Shipping</em></span></a></li>
+							<li><a href="#section-circlefill-3"
+								onclick='changePageGro(3)'><img src="/freight/img/ky_3.png"><span
+									style="padding-left: 15px;"><img
+										src="/freight/img/jiant.png"><em>Air Shipping</em></span></a></li>
+							<li><a href="#section-circlefill-4"
+								onclick='changePageGro(4)'><img src="/freight/img/ky_4.png"><span><img
+										src="/freight/img/jiant.png"><em>Express Mail</em></span></a></li>
+						</ul>
+					</nav>
+					<div class="content-wrap">
+						<section id="section-circlefill-1">
+							<div class="typi">
+								<p>
+									<span class="glyphicon glyphicon-thumbs-up">Typical
+										Dimensions: </span>
+								</p>
+								<p>
+									<em><b>20 ft Container：</b><br> Internal 5.7 x 2.1 x
+										2.1 Meter, Weight Limit 18 Ton, Volume 24- 26 Cubic Meter.</em> <em><b>40
+											ft Container：</b><br> Internal 11.8 x 2.1 x 2.1 Meter,
+										Weight Limit 22 Ton, Volume 54 Cubic Meter.</em> <em><b>40
+											ft HQ Container：</b><br> Internal 11.8 x 2.1 x 2.7 Meter,
+										Weight Limit 22 Ton, Volume 68 Cubic Meter.</em>
+								</p>
+							</div>
+							<div class="fenye" style="width: 76%; float: left;">
+								<div class="sanjiao1"></div>
+
+								<div class="firdiv">
+									<form class="form-horizontal" role="form" action="">
+										<label class="control-label">Departure Port</label> <label><input
+											id="aa" style="width: 100px;" name="qidian"
+											placeholder="Departure Port"></label> <label
+											class="control-label" style="margin-left: 30px;">Destination
+											Port</label> <label><input id="bb" style="width: 100px"
+											name="zhongdian" placeholder="Destination Port"></label>
+										<button type="button" class="btn btn-default"
+											onclick="divshow(1,1)">Search</button>
+
+									</form>
+									<div class="redian">
+										<a onclick="selectDepCity(1,'SHANGHAI')">Shanghai</a> <a
+											onclick="selectDepCity(1,'NINGBO')">Ningbo</a> <a
+											onclick="selectDepCity(1,'QINGDAO')"> Qingdao</a> <a
+											onclick="selectDepCity(1,'GUANGZHOU')"
+											style="border-right: none;">Guangzhou</a>
+									</div>
+									<div class="redian red2">
+										<a onclick="selectDesCity(1,'NEW YORK')">New York</a> <a
+											onclick="selectDesCity(1,'LOS ANGELES')">Los Angeles</a> <a
+											onclick="selectDesCity(1,'HAMBURG')">Hamburg</a> <a
+											onclick="selectDesCity(1,'FELIXSTOWE')">Felixstowe</a> <a
+											onclick="selectDesCity(1,'ROTTERDAM')"
+											style="border-right: none;"> Rotterdam</a>
+									</div>
+								</div>
+								<!-- <div class="sec_form row" id="holder1">
+									<div class="tag">Do you need the following services as
+										well:</div>
+									<div class="button-holder">
+										<input type="checkbox" id="radio-1-1" name="radio-1-set"
+											class="regular-radio big-radio" value="0" /> <label
+											for="radio-1-1"></label> <em>Custom clearance and
+											freight forwarding</em>
+									</div>
+								</div> -->
+								<div id="type1"></div>
+							</div>
+						</section>
+						<section id="section-circlefill-2">
+							<div class="fenye">
+								<div class="sanjiao2"></div>
+								<div class="sec_form" style="width: 100%;">
+									<form class="form-horizontal" role="form"
+										style="display: inline-block;">
+										<label class="control-label">Departure Port</label> <label><input
+											id="cc" style="width: 100px"></label> <label
+											class="control-label" style="margin-left: 30px;">Destination
+											Port</label> <label><input id="dd" style="width: 100px"></label>
+										<button type="button" class="btn btn-default"
+											onclick='divshow(2,1)'>Search</button>
+									</form>
+									<div class="redian" style="width: 25%; padding-left: 4%;">
+										<a onclick="selectDepCity(2,'SHANGHAI')">Shanghai</a> <a
+											onclick="selectDepCity(2,'NINGBO')">Ningbo</a> <a
+											onclick="selectDepCity(2,'QINGDAO')"> Qingdao</a> <a
+											onclick="selectDepCity(2,'GUANGZHOU')"
+											style="border-right: none; margin-left: 0px;">Guangzhou</a>
+									</div>
+									<div class="redian red2">
+										<a onclick="selectDesCity(2,'NEW YORK')">New York</a> <a
+											onclick="selectDesCity(2,'LOS ANGELES')">Los Angeles</a> <a
+											onclick="selectDesCity(2,'HAMBURG')">Hamburg</a> <a
+											onclick="selectDesCity(2,'FELIXSTOWE')">Felixstowe</a> <a
+											onclick="selectDesCity(2,'ROTTERDAM')"
+											style="border-right: none;"> Rotterdam</a>
+									</div>
+								</div>
+								<!-- <div class="sec_form row" id="holder2">
+									<div class="tag">Do you need the following services as
+										well:</div>
+									<div class="button-holder">
+										<input type="checkbox" id="radio-2-1" name="radio-2-set"
+											class="regular-radio big-radio" value="0" /> <label
+											for="radio-2-1"></label> <em>Custom clearance and
+											freight forwarding</em>
+									</div>
+								</div> -->
+								<div id="type2"></div>
+							</div>
+						</section>
+						<section id="section-circlefill-3">
+							<div class="fenye">
+								<div class="sanjiao3"></div>
+								<div class="sec_form">
+									<form class="form-horizontal" role="form">
+										<label class="control-label">Departure Port</label> <label><input
+											id="hh" style="width: 150px"></label> <label
+											class="control-label" style="margin-left: 5%;">Destination
+											Port</label> <label><input id="ff" style="width: 150px"></label>
+										<div class="volu">
+											<button type="button" class="btn btn-default"
+												onclick="divshow(3,1)">Search</button>
+										</div>
+									</form>
+
+									<div class="redian" style="width: 17%; padding-left: 12%;">
+										<a onclick="selectDepCity(3,'SHA')">SHA</a> <a
+											onclick="selectDepCity(3,'PEK')">PEK</a> <a
+											onclick="selectDepCity(3,'SZX')">SZX</a> <a
+											onclick="selectDepCity(3,'CAN')" style="border-right: none;">CAN</a>
+									</div>
+									<div class="redian red2"
+										style="width: 25%; margin-left: 13.5%;">
+										<a onclick="selectDesCity(3,'JFK')">JFK </a> <a
+											onclick="selectDesCity(3,'LAX')">LAX </a> <a
+											onclick="selectDesCity(3,'LHR')">LHR </a> <a
+											onclick="selectDesCity(3,'MEL')">MEL </a> <a
+											onclick="selectDesCity(3,'YHM')" style="border-right: none;">YHM</a>
+									</div>
+
+								</div>
+								<!-- <div class="sec_form row" id="holder3">
+									<div class="tag">Do you need the following services as
+										well:</div>
+									<div class="button-holder">
+										<input type="checkbox" id="radio-3-1" name="radio-3-set"
+											class="regular-radio big-radio" value="0" /> <label
+											for="radio-3-1"></label> <em>Custom clearance and
+											freight forwarding</em>
+									</div>
+								</div> -->
+								<div id='type3'></div>
+
+							</div>
+
+						</section>
+						<section id="section-circlefill-4">
+							<div class="fenye">
+								<div class="sanjiao4"></div>
+								<div class="sec_form">
+									<form class="form-horizontal" role="form">
+										<label class="control-label"> Destination Country</label> <label>
+											<input id="ii" style="width: 100px" />
+										</label> <label class="control-label">Weight</label> <input id="jj"
+											style="width: 100px" placeholder="请输入重量" /> <select
+											id="kuaiyoukg" class="sele">
+											<option value="volvo" selected="selected">KG</option>
+											<option value="saab">LB</option>
+
+										</select> <label class="control-label">Volume</label> <input id="qq"
+											style="width: 100px" placeholder="请输入体积" /> <select
+											id="kuaiyoulb" class="selec">
+											<option value="volvo" selected="selected">CBM</option>
+											<option value="saab">Cubic Foot</option>
+
+										</select>
+										<button type="button" class="btn btn-default"
+											onclick="divshow(4,1)">Search</button>
+
+									</form>
+								</div>
+								<!-- <div class="sec_form row" id="holder4">
+									<div class="tag">Do you need the following services as
+										well:</div>
+									<div class="button-holder">
+										<input type="checkbox" id="radio-4-1" name="radio-4-set"
+											class="regular-radio big-radio" value="0" /> <label
+											for="radio-4-1"></label> <em>Custom clearance and
+											freight forwarding</em>
+									</div>
+								</div> -->
+								<div id='type4'></div>
+							</div>
+						</section>
+						<div id="showEmpty"
+							style="margin: auto; width: 50%; color: #3f9056; display: none;">Sorry,No
+							data!</div>
+						<div>
+							<div id="pageCode1" class="pageGro"
+								style="margin: auto; width: 50%;"></div>
+							<div id="pageCode2" class="pageGro"
+								style="margin: auto; width: 50%;"></div>
+							<div id="pageCode3" class="pageGro"
+								style="margin: auto; width: 50%;"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div class="mind_1">
+		<div class="container">
+			<h2 class="mind1-title">We also offer Ship to door cost</h2>
+			<div class="mind1_neir">
+				<p style="margin-top: 50px;">We can also handle custom clearance
+					and ship to your door.</p>
+				<p>
+					<b>Ship to door cost = Ship to Port Cost + Domestic Trucking
+						Cost + Custom Fees</b>
+				</p>
+				<p>Custom Processing Fee is usually $350 USD all included except
+					Tax & Duty</p>
+				<a href="/freight/Aboutus.html" class="mind1_anj  mind_inp1">>>
+					About us</a>
+				<div class="feij">
+					<img src="/freight/img/feij.png">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="mind_2">
+		<div class="container"
+			style="background: #080f59; height: 450px; padding-top: 30px; padding-bottom: 50px;">
+			<h2 class="mind2_title">Other Services</h2>
+			<div class="mind2_neir">
+				<div class="mind2_tp">
+					<img src="/freight/img/mind2_tp.jpg">
+				</div>
+				<div class="mind2_p">
+					<p>Besides shipping , we also offer value add services such as</p>
+					<p>
+						<i></i><span>Product Inspection Before Loading</span>
+					</p>
+					<p>
+						<i></i><span>Inventroy and Conslidate Shipping from Mutiple
+							Factories</span>
+					</p>
+					<p>
+						<i></i><span>Drop Shipping</span>
+					</p>
+					<p>
+						<i></i><span>Warehousing in Your Country </span>
+					</p>
+					<p>
+						<i></i><span>Supply Chain Financing </span>
+					</p>
+					<input type="button" value="Contact Us Now" class="cont-inpu"
+						onclick="Contactus()">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="banquan">
+		<div class="container">
+			<ul>
+				<li class="tail_li2"><img src="/freight/img/foot_logo.png"></li>
+				<li class="tail_li3">Copyright 2017 <a href="#">www.chinaseaair.com</a>
+					All rights reserved.
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<!-- /content -->
+
+	<script>
+		(function() {
+
+			[].slice.call(document.querySelectorAll('.tabs')).forEach(
+					function(el) {
+						new CBPFWTabs(el);
+					});
+
+		})();
+	</script>
+	<!--以上为mind部分-->
+</body>
+</html>

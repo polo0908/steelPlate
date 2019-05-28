@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.KongYunPortMapper">
+	<resultMap id="BaseResultMap" type="com.yf.bean.KongYunPort">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="enPortName" property="enPortName" jdbcType="VARCHAR" />
+		<result column="chPortName" property="chPortName" jdbcType="VARCHAR" />
+		<result column="enCityName" property="enCityName" jdbcType="VARCHAR" />
+		<result column="chCityName" property="chCityName" jdbcType="VARCHAR" />
+		<result column="enCountryName" property="enCountryName" jdbcType="VARCHAR" />
+		<result column="chCountryName" property="chCountryName" jdbcType="VARCHAR" />
+		<result column="airportCode" property="airportCode" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, enPortName, chPortName, enCityName, chCityName,
+		enCountryName,chCountryName,airportCode
+	</sql>
+	<select id="selectByName" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyunport
+		<if test="chPortName !=null and chPortName != ''">
+			where chPortName =#{chPortName,jdbcType=VARCHAR}
+		</if>
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyunport
+		where id = #{id}
+	</select>
+
+	<!-- 除去中国 动态搜索框 -->
+	<select id="ajaxKongYunName" resultMap="BaseResultMap">
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyunport where 1=1 
+		and (chPortName like CONCAT(#{doctor_name},'%') 
+		or enPortName like CONCAT(#{doctor_name},'%') 
+		<!-- or enSuoXie like CONCAT(#{doctor_name},'%')  -->
+		) and chCountryName !='中国' and ifnull(isMainPort,'N') = 'Y'
+		order by enCityName
+	</select>
+	<!-- 中国 动态搜索框起点 -->
+	<select id="ajaxQiDian" resultMap="BaseResultMap">
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyunport where 1=1 
+		and (chPortName like CONCAT(#{doctor_name},'%') 
+		or enPortName like CONCAT(#{doctor_name},'%') 
+		<!-- or enSuoXie like CONCAT(#{doctor_name},'%') -->
+		) and chCountryName ='中国'
+		order by enCityName
+	</select>
+
+	<insert id="insert" parameterType="com.yf.bean.KongYunPort">
+		insert into
+		yf_kongyunport_copy (enPortName, chPortName, enCityName, chCityName,
+		enCountryName,chCountryName,airportCode)
+		values (#{enPortName,jdbcType=VARCHAR},
+		#{chPortName,jdbcType=VARCHAR},
+		#{enCityName,jdbcType=VARCHAR},
+		#{chCityName,jdbcType=VARCHAR}),
+		#{enCountryName,jdbcType=VARCHAR}),
+		#{chCountryName,jdbcType=VARCHAR}),
+		#{airportCode,jdbcType=VARCHAR})
+	</insert>
+
+</mapper>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.MaterialPriceMapper" >
+  <resultMap id="BaseResultMap" type="com.cal.bean.MaterialPrice" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="material_type" property="materialType" jdbcType="VARCHAR" />
+    <result column="unit_price" property="unitPrice" jdbcType="INTEGER" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="source_website" property="sourceWebsite" jdbcType="VARCHAR" />
+    <result column="material_detail" property="materialDetail" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, material_type, unit_price, update_date, source_website, material_detail
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from material_price
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  
+  <!-- 根据材质详情类型获取价格 -->
+  <select id="getPriceByType" resultType="java.lang.Integer">  
+     select unit_price from material_price where id in (select MAX(id) from material_price where material_detail = #{materialDetail,jdbcType=VARCHAR}) 
+  </select>
+  
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from material_price
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <!-- 删除超过一个月的抓取数据 -->
+  <delete id="deleteUpOneMonth" parameterType="java.lang.Integer">
+    delete from material_price where update_date &lt; DATE_SUB(NOW(),INTERVAL 1 MONTH)
+  </delete>
+  
+  
+  <insert id="insert" parameterType="com.cal.bean.MaterialPrice" >
+    insert into material_price (id, material_type, unit_price, 
+      update_date, source_website, material_detail
+      )
+    values (#{id,jdbcType=INTEGER}, #{materialType,jdbcType=VARCHAR}, #{unitPrice,jdbcType=INTEGER}, 
+      #{updateDate,jdbcType=DATE}, #{sourceWebsite,jdbcType=VARCHAR}, #{materialDetail,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.cal.bean.MaterialPrice" >
+    insert into material_price
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="materialType != null" >
+        material_type,
+      </if>
+      <if test="unitPrice != null" >
+        unit_price,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="sourceWebsite != null" >
+        source_website,
+      </if>
+      <if test="materialDetail != null" >
+        material_detail,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="materialType != null" >
+        #{materialType,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        #{unitPrice,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="sourceWebsite != null" >
+        #{sourceWebsite,jdbcType=VARCHAR},
+      </if>
+      <if test="materialDetail != null" >
+        #{materialDetail,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cal.bean.MaterialPrice" >
+    update material_price
+    <set >
+      <if test="materialType != null" >
+        material_type = #{materialType,jdbcType=VARCHAR},
+      </if>
+      <if test="unitPrice != null" >
+        unit_price = #{unitPrice,jdbcType=INTEGER},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="sourceWebsite != null" >
+        source_website = #{sourceWebsite,jdbcType=VARCHAR},
+      </if>
+      <if test="materialDetail != null" >
+        material_detail = #{materialDetail,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cal.bean.MaterialPrice" >
+    update material_price
+    set material_type = #{materialType,jdbcType=VARCHAR},
+      unit_price = #{unitPrice,jdbcType=INTEGER},
+      update_date = #{updateDate,jdbcType=DATE},
+      source_website = #{sourceWebsite,jdbcType=VARCHAR},
+      material_detail = #{materialDetail,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

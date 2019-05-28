@@ -1,0 +1,272 @@
+package com.cal.controller;
+
+import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.util.Map;
+
+import com.cal.bean.OrderDetails;
+import com.cal.util.SerializeUtil;
+
+public class CalculatingProduct implements Serializable {
+     
+    private static final double PAI = 3.14;
+	
+	public static OrderDetails calculate(String parameterMm,Integer priceUnit,Integer goodsTypeId,Integer set,Double density){
+		  OrderDetails orderDetails = new OrderDetails();   	   	
+		  
+		   Map<Object, Object> map = SerializeUtil.JsonToMap(parameterMm);		   
+		   DecimalFormat df = new DecimalFormat("0.0000000");//格式化小数，不足的补0
+		   DecimalFormat df1 = new DecimalFormat("0.00");
+		   //单个重量
+		   Double weight = 0.0;
+		   orderDetails.setWeightUnit("ton");
+		   //单个面积
+		   Double superficialArea = 0.0;
+		   orderDetails.setSuperficialAreaUnit("m^2");
+		   //单个体积
+		   Double space = 0.0;
+		   orderDetails.setSpaceUnit("m^3");
+		   //单个材料价格
+		   Double price = 0.0;
+		   
+//	   System.out.println(map);
+		   if(goodsTypeId == 0){    		   
+		
+			   if(map.get("width") != null && !"".equals(map.get("width"))  && 
+				  map.get("thickness") != null && !"".equals(map.get("thickness")) && 
+				  map.get("length") != null && !"".equals(map.get("length"))){
+				   Double w = Double.valueOf(map.get("width").toString());
+				   Double t = Double.valueOf(map.get("thickness").toString());
+				   Double l = Double.valueOf(map.get("length").toString());
+				   space =  (w*t*l)/1000000000;    		   
+				   superficialArea = l*w*0.000001;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(w+"*"+t+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+//			   //查询利润率
+//			   ProfitManagment p1 = profitManagmentService.queryById(1);
+//			   ProfitManagment p2 = profitManagmentService.queryById(2);
+//			   if(price > p1.getPrice()){
+//				   orderDetails.setProfitRate(p1.getProfitRate()); 
+//				   orderDetails.setProfitManagment(0.0);
+//			   }else{
+//				   orderDetails.setProfitRate(p2.getProfitRate());
+//			   }
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+//			   orderDetails.setTax(0.0);
+				   
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }    		   
+		   }
+		   if(goodsTypeId == 1){
+			   if(map.get("Dia.outer") != null && map.get("Dia.outer") != "" && 
+		    	  map.get("thickness") != null && map.get("thickness") != "" && 
+		    	  map.get("length") != null && map.get("length") != ""){
+				   Object object = map.get("Dia.outer");
+				   Double d = Double.valueOf(object.toString());
+				   d = d/1000;
+				   Double t = Double.valueOf(map.get("thickness").toString());
+				   t = t/1000;
+				   Double l = Double.valueOf(map.get("length").toString()); 
+				   l = l/1000;
+			       space = (PAI*((d/2)*(d/2)-(d/2-t)*(d/2-t))*l);
+
+			       superficialArea = PAI*d*l;
+		       
+			       weight = space * density;
+			       orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(d*1000+"*"+t*1000+"*"+l*1000+"*mm");
+				   price = priceUnit * weight;  			    
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+		           
+			   }
+		   }
+		   if(goodsTypeId == 2){
+			   if(map.get("width A") != null && map.get("width A") != "" && 
+				  map.get("width B") != null && map.get("width B") != "" && 
+				  map.get("length") != null && map.get("length") != "" && 
+				  map.get("thickness") != null && map.get("thickness") != "" ){
+				   Double a = Double.valueOf(map.get("width A").toString());
+				   Double b = Double.valueOf(map.get("width B").toString());
+				   Double l = Double.valueOf(map.get("length").toString());
+				   Double t = Double.valueOf(map.get("thickness").toString());  
+
+				   space = (a*b+(a-2*t)*(b-2*t))*l/1000000000;
+				   superficialArea = (a+b+a+b)*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(a+"*"+b+"*"+t+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }
+		   }
+		   if(goodsTypeId == 3){
+			   if(map.get("diameter") != null && map.get("diameter") != "" && 
+					   map.get("length") != null && map.get("length") != "" ){
+				   Double d = Double.valueOf(map.get("diameter").toString());
+				   Double l = Double.valueOf(map.get("length").toString());   
+				   
+				   space = (d*d*PAI/4*l)/1000000000;
+				   superficialArea = PAI*d*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(d+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+			   }
+		   }
+		   if(goodsTypeId == 4){
+			   if(map.get("width") != null && map.get("width") != "" && 
+			      map.get("height") != null && map.get("height") != "" && 
+			      map.get("thickness t") != null && map.get("thickness t") != "" && 
+			      map.get("thickness d") != null && map.get("thickness d") != "" &&
+			      map.get("length") != null && map.get("length") != "" ){
+				   Double w = Double.valueOf(map.get("width").toString());
+				   Double h = Double.valueOf(map.get("height").toString());   
+				   Double t = Double.valueOf(map.get("thickness t").toString()); 
+				   Double d = Double.valueOf(map.get("thickness d").toString());   
+				   Double l = Double.valueOf(map.get("length").toString());     
+
+				   space = (w*d*2+(h-2d)*t)*l/1000000000;
+				   superficialArea = (w*4+h*2)*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(w+"*"+h+"*"+t+"*"+d+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+			   }
+		   }
+		   
+		   if(goodsTypeId == 5){
+			   if(map.get("width a") != null && map.get("width a") != "" && 
+				   map.get("width b") != null && map.get("width b") != "" && 
+				   map.get("thickness") != null && map.get("thickness") != "" && 
+				   map.get("length") != null && map.get("length") != "" ){
+				   Double a = Double.valueOf(map.get("width a").toString()); 
+				   Double b = Double.valueOf(map.get("width b").toString());   
+				   Double t = Double.valueOf(map.get("thickness").toString());  
+				   Double l = Double.valueOf(map.get("length").toString());   
+				   
+				   space = (a+b-t)*t*l/1000000000;
+				   superficialArea = (a+b)*2*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(a+"*"+b+"*"+t+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }
+		   }
+		   if(goodsTypeId == 6){
+			   if(map.get("width") != null && map.get("width") != "" &&     				  
+				  map.get("thickness") != null && map.get("thickness") != "" && 
+				  map.get("length") != null && map.get("length") != "" ){
+				   Double w = Double.valueOf(map.get("width").toString());  
+				   Double t = Double.valueOf(map.get("thickness").toString());  
+				   Double l = Double.valueOf(map.get("length").toString());    
+				   
+				   space = w*t*l/1000000000;
+				   superficialArea = (w+t)*2*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(w+"*"+t+"*"+l+"*mm");
+				   price = priceUnit * weight ;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }
+		   }
+		   if(goodsTypeId == 7){
+			   if(map.get("width") != null && map.get("width") != "" &&     				  
+					   map.get("height") != null && map.get("height") != "" && 
+					   map.get("length") != null && map.get("length") != "" ){
+				   Double w = Double.valueOf(map.get("width").toString());  
+				   Double h = Double.valueOf(map.get("height").toString());   
+				   Double l = Double.valueOf(map.get("length").toString());   
+				   
+				   space = w*h*l/1000000000;
+				   superficialArea = (w+h)*2*l/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(w+"*"+h+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }
+		   }
+		   if(goodsTypeId == 8){
+			   if(map.get("height") != null && map.get("height") != "" && 
+					   map.get("thickness d") != null && map.get("thickness d") != "" &&
+					   map.get("avg thk") != null && map.get("avg thk") != "" &&
+					   map.get("width") != null && map.get("width") != "" && 
+					   map.get("length") != null && map.get("length") != "" ){
+				   Double h = Double.valueOf(map.get("height").toString());   
+				   Double d = Double.valueOf(map.get("thickness d").toString());   
+				   Double avg = Double.valueOf(map.get("avg thk").toString());    
+				   Double w = Double.valueOf(map.get("width").toString());   
+				   Double l = Double.valueOf(map.get("length").toString());   
+				   
+				   space = ((w+w)*avg+h*d-avg*d*2)*l/1000000000;
+				   superficialArea = (h+w*2)*l*2/1000000;
+				   weight = space * density;
+				   orderDetails.setSpace(Double.parseDouble(df.format(space)));
+				   orderDetails.setWeight(Double.parseDouble(df.format(weight)));
+				   orderDetails.setSuperficialArea(Double.parseDouble(df.format(superficialArea)));	
+				   orderDetails.setProductSize(h+"*"+d+"*"+avg+"*"+w+"*"+l+"*mm");
+				   price = priceUnit * weight;
+				   
+				   orderDetails.setUnitPrice(Double.parseDouble(df1.format(price)));
+				   
+				   orderDetails.setPrice(Double.parseDouble(df1.format(price)));
+
+			   }
+		   }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		return orderDetails;
+	}
+	
+	
+}

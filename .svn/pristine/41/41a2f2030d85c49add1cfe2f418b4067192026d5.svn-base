@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.GoodsTypeNormalMapper">
+	<resultMap id="goodsTypeNormalResultMap" type="com.cal.bean.GoodsTypeNormal">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_type_info_id" property="goodsTypeInfoId" jdbcType="INTEGER" />
+		<result column="parameter_normal" property="parameterNormal" jdbcType="VARCHAR" />
+		<result column="parameter_type" property="parameterType" jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<sql id="goodsTypeNormalColumnList">
+		id,goods_type_info_id,parameter_normal,parameter_type
+	</sql>
+
+	<select id="queryById" resultMap="goodsTypeNormalResultMap" parameterType="java.lang.Integer">
+		select 
+		<include refid="goodsTypeNormalColumnList" />
+		from goods_type_normal 
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+
+    <!-- 根据分类Id查询 -->
+	<select id="queryByGoodsTypeInfoId" resultMap="goodsTypeNormalResultMap" parameterType="java.lang.Integer">
+	    select 
+		<include refid="goodsTypeNormalColumnList" />
+		from goods_type_normal 
+		where goods_type_info_id = #{goodsTypeInfoId,jdbcType=INTEGER}
+	</select>
+
+</mapper>

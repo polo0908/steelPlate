@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.mapper.SteelPlateOrderMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.model.SteelPlateOrder">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="itemId" property="itemid" jdbcType="VARCHAR" />
+		<result column="steelPlate_id" property="steelplateId"
+			jdbcType="INTEGER" />
+		<result column="sCategory" property="scategory" jdbcType="VARCHAR" />
+		<result column="sName" property="sname" jdbcType="VARCHAR" />
+		<result column="sMaterial" property="smaterial" jdbcType="VARCHAR" />
+		<result column="sModel" property="smodel" jdbcType="VARCHAR" />
+		<result column="weight" property="weight" jdbcType="DOUBLE" />
+		<result column="length" property="length" jdbcType="INTEGER" />
+		<result column="sPrice" property="sprice" jdbcType="DOUBLE" />
+		<result column="uPrice" property="uprice" jdbcType="DOUBLE" />
+		<result column="margin" property="margin" jdbcType="DOUBLE" />
+		<result column="pMethod" property="pmethod" jdbcType="VARCHAR" />
+		<result column="uCompanyName" property="ucompanyname" jdbcType="VARCHAR" />
+		<result column="uEmail" property="uemail" jdbcType="VARCHAR" />
+		<result column="uPhoneNumber" property="uphonenumber" jdbcType="VARCHAR" />
+		<result column="INCO_term" property="incoTerm" jdbcType="VARCHAR" />
+		<result column="confirm" property="confirm" jdbcType="VARCHAR" />
+		<result column="confirmInfo" property="confirminfo" jdbcType="VARCHAR" />
+		<result column="custom" property="custom" jdbcType="VARCHAR" />
+		<result column="customInfo" property="custominfo" jdbcType="VARCHAR" />
+		<result column="time" property="time" jdbcType="TIMESTAMP" />
+		<result column="delivery_time" property="deliveryTime"
+			jdbcType="TIMESTAMP" />
+		<result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, itemId, steelPlate_id, sCategory, sName, sMaterial, sModel, weight,
+		length, sPrice,
+		uPrice, margin, pMethod, uCompanyName, uEmail, uPhoneNumber, INCO_term,
+		confirm,
+		confirmInfo, custom, customInfo, time, delivery_time, order_status
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="string">
+		select
+		<include refid="Base_Column_List" />
+		from steel_plate_order
+		where itemId = #{itemId,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from steel_plate_order
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.cbt.model.SteelPlateOrder">
+		insert into steel_plate_order
+		(id, itemId, steelPlate_id,
+		sCategory, sName, sMaterial,
+		sModel, weight, length,
+		sPrice, uPrice, margin,
+		pMethod, uCompanyName, uEmail,
+		uPhoneNumber, INCO_term, confirm,
+		confirmInfo, custom, customInfo,
+		time, delivery_time , order_status)
+		values 
+		(
+		#{id,jdbcType=INTEGER},
+		#{itemid,jdbcType=VARCHAR},
+		#{steelplateId,jdbcType=INTEGER},
+		#{scategory,jdbcType=VARCHAR}, 
+		#{sname,jdbcType=VARCHAR},
+		#{smaterial,jdbcType=VARCHAR},
+		#{smodel,jdbcType=VARCHAR},
+		 #{weight,jdbcType=DOUBLE},
+		#{length,jdbcType=INTEGER},
+		#{sprice,jdbcType=DOUBLE}, 
+		#{uprice,jdbcType=DOUBLE}, 
+		#{margin,jdbcType=DOUBLE},
+		#{pmethod,jdbcType=VARCHAR}, 
+		#{ucompanyname,jdbcType=VARCHAR},
+		#{uemail,jdbcType=VARCHAR},
+		#{uphonenumber,jdbcType=INTEGER},
+		 #{incoTerm,jdbcType=VARCHAR}, 
+		 #{confirm,jdbcType=VARCHAR},
+		#{confirminfo,jdbcType=VARCHAR}, 
+		#{custom,jdbcType=VARCHAR},
+		#{custominfo,jdbcType=VARCHAR},
+		#{time,jdbcType=TIMESTAMP}, 
+		#{deliveryTime,jdbcType=TIMESTAMP},
+		#{orderStatus,jdbcType=INTEGER}
+		)
+	</insert>
+
+<!-- 	<update id="updateByExampleSelective" parameterType="map"> -->
+<!-- 		update steel_plate_order -->
+<!-- 		<set> -->
+<!-- 			<if test="record.id != null"> -->
+<!-- 				id = #{record.id,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.itemid != null"> -->
+<!-- 				itemId = #{record.itemid,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.steelplateId != null"> -->
+<!-- 				steelPlate_id = #{record.steelplateId,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.scategory != null"> -->
+<!-- 				sCategory = #{record.scategory,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.sname != null"> -->
+<!-- 				sName = #{record.sname,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.smaterial != null"> -->
+<!-- 				sMaterial = #{record.smaterial,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.smodel != null"> -->
+<!-- 				sModel = #{record.smodel,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.weight != null"> -->
+<!-- 				weight = #{record.weight,jdbcType=DOUBLE}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.length != null"> -->
+<!-- 				length = #{record.length,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.sprice != null"> -->
+<!-- 				sPrice = #{record.sprice,jdbcType=DOUBLE}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.uprice != null"> -->
+<!-- 				uPrice = #{record.uprice,jdbcType=DOUBLE}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.margin != null"> -->
+<!-- 				margin = #{record.margin,jdbcType=DOUBLE}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.pmethod != null"> -->
+<!-- 				pMethod = #{record.pmethod,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.ucompanyname != null"> -->
+<!-- 				uCompanyName = #{record.ucompanyname,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.uemail != null"> -->
+<!-- 				uEmail = #{record.uemail,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.uphonenumber != null"> -->
+<!-- 				uPhoneNumber = #{record.uphonenumber,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.incoTerm != null"> -->
+<!-- 				INCO_term = #{record.incoTerm,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.confirm != null"> -->
+<!-- 				confirm = #{record.confirm,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.confirminfo != null"> -->
+<!-- 				confirmInfo = #{record.confirminfo,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.custom != null"> -->
+<!-- 				custom = #{record.custom,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.custominfo != null"> -->
+<!-- 				customInfo = #{record.custominfo,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.time != null"> -->
+<!-- 				time = #{record.time,jdbcType=TIMESTAMP}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.deliveryTime != null"> -->
+<!-- 				delivery_time = #{record.deliveryTime,jdbcType=TIMESTAMP}, -->
+<!-- 			</if> -->
+<!-- 		</set> -->
+<!-- 		<if test="_parameter != null"> -->
+<!-- 			<include refid="Update_By_Example_Where_Clause" /> -->
+<!-- 		</if> -->
+<!-- 	</update> -->
+
+
+</mapper>

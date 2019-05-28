@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.CustomerInfoMapper">
+	<resultMap id="customerInfoResultMap" type="com.cal.bean.CustomerInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="company_name" property="companyName" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="country" property="country" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="phone" property="phone" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="clientOrderColumnList">
+		id,username,create_time,
+		company_name,email,
+		country,city,phone
+	</sql>
+
+
+	<insert id="insertCustomerInfo" useGeneratedKeys="true" keyProperty="id" parameterType="com.cal.bean.CustomerInfo">
+		insert into customer_info
+		(
+		id,username,create_time,
+		company_name,email,
+		country,city,phone
+		)
+		values 
+		(
+		#{id,jdbcType=INTEGER},
+		#{username,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{companyName,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{country,jdbcType=VARCHAR},
+		#{city,jdbcType=VARCHAR},
+		#{phone,jdbcType=VARCHAR}
+		)
+	</insert>
+   
+   <!-- 根据邮箱查询 -->
+   <select id="queryByEmail" parameterType="string" resultMap="customerInfoResultMap">
+      select
+      <include refid="clientOrderColumnList"/>
+      from customer_info
+      where email = #{email,jdbcType=VARCHAR}
+   </select>
+   
+   <!-- 更新客户数据 -->
+   <update id="updateCustomerInfo" parameterType="com.cal.bean.CustomerInfo">
+      update customer_info 
+      <set>
+         <if test="phone != null">
+			phone = #{phone,jdbcType=VARCHAR},
+		</if>
+         <if test="country != null">
+			country = #{country,jdbcType=VARCHAR},
+		</if>
+         <if test="city != null">
+			city = #{city,jdbcType=VARCHAR},
+		</if>
+      </set>
+      	 where id = #{id,jdbcType=INTEGER}
+   </update>
+   
+
+</mapper>

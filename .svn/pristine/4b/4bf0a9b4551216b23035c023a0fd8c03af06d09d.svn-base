@@ -1,0 +1,111 @@
+package com.cal.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cal.bean.ClientOrder;
+import com.cal.bean.CustomerDrawingName;
+import com.cal.bean.CustomerInfo;
+import com.cal.bean.CustomerQuote;
+import com.cal.service.ClientOrderService;
+import com.cal.service.CustomerDrawingNameService;
+import com.cal.service.CustomerInfoService;
+import com.cal.service.CustomerQuoteService;
+import com.cal.util.DateFormat;
+
+@Controller
+@RequestMapping("/calculator")
+public class CustomerQuoteController {
+	
+	public static Logger logger = Logger.getLogger(CustomerQuoteController.class);
+	 @Resource
+	 private ClientOrderService clientOrderService;
+	 @Resource
+	 private CustomerInfoService customerInfoService;
+	 @Resource
+	 private CustomerQuoteService customerQuoteService;
+	 @Resource
+	 private CustomerDrawingNameService customerDrawingNameService;
+	
+	 @Transactional
+	 @ResponseBody
+	 @RequestMapping("/saveCustomerQuotePort.do")
+	 public String saveCustomerQuotePort(HttpServletRequest request, HttpServletResponse response){
+		
+		 try {
+			String quoteId = request.getParameter("quoteId");
+			 String email = request.getParameter("email");
+			 String phone = request.getParameter("phone");
+			 String requirements = request.getParameter("requirements");
+			 String map1=request.getParameter("attachment");		 
+
+			 CustomerInfo customerInfo = new CustomerInfo();
+			 CustomerQuote customerQuote = new CustomerQuote();
+			
+			 
+			 customerQuote.setRequirements(requirements);
+			 customerQuote.setQuoteId(quoteId);
+			 
+			 customerInfo.setEmail(email);
+			 customerInfo.setPhone(phone);
+			 ClientOrder clientOrder = clientOrderService.queryByQuoteId(quoteId);
+			 if(!(clientOrder.getCountry() == null || "".equals(clientOrder.getCountry()) || clientOrder.getCity() == null || "".equals(clientOrder.getCity()))){
+				 customerInfo.setCountry(clientOrder.getCountry()); 
+				 customerInfo.setCity(clientOrder.getCity());
+			 }
+
+			 
+			 CustomerInfo c = customerInfoService.queryByEmail(email);
+			 if(c == null){
+				 customerInfo.setCreateTime(DateFormat.format());
+				 customerInfoService.insertCustomerInfo(customerInfo); 
+			 }else{
+				 customerInfoService.updateCustomerInfo(customerInfo);
+			 }
+			 customerQuote.setCustomerId(customerInfo.getId());
+			 customerQuote.setCreateTime(DateFormat.format());
+			 customerQuoteService.insertCustomerQuote(customerQuote);
+			 
+   
+			 Map<String,String> map = new <String,String> HashMap();  
+			 java.util.StringTokenizer items;  
+			 for(StringTokenizer entrys = new StringTokenizer(map1, "^");entrys.hasMoreTokens();   
+			 map.put(items.nextToken(), (String) (items.hasMoreTokens() ? ((Object) (items.nextToken())) : null)))  
+			 items = new StringTokenizer(entrys.nextToken(), "'");  
+			 List<CustomerDrawingName> list = new ArrayList<CustomerDrawingName>();
+			 CustomerDrawingName customerDrawingName = new CustomerDrawingName();
+			 Set<String> keySet = map.keySet();
+
+			   for (String key : keySet) {
+					String emailfile = map.get(key);
+					customerDrawingName.setEmoldName(emailfile);
+			    	 customerDrawingName.setOriginalName(key);
+			    	 customerDrawingName.setQuoteId(quoteId);
+			    	 customerDrawingName.setCustomerId(customerInfo.getId());
+			    	 list.add(customerDrawingName);
+			   } 
+
+			 
+			 customerDrawingNameService.insertCustomerDrawingNames(list);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+		 
+		 return "success";
+	 }
+}

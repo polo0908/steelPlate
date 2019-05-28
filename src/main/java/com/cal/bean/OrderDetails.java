@@ -1,0 +1,220 @@
+package com.cal.bean;
+
+import java.io.Serializable;
+import java.util.List;
+
+public class OrderDetails implements Serializable {
+
+	
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Integer id;
+	  private String quoteId;   //订单号
+	  private String partName;               //物品名
+	  private Integer goodsTypeId;           //物品种类id
+	  private Integer materialId;            //材料id
+	  private String parameterMm;            //参数mm
+	  private String productSize;            //参数mm
+	  private String parameterInch;          //参数inch
+	  private Integer goodsSet;              //产品件数
+	  private Double weight;                 //重量
+	  private String weightUnit;            //重量单位
+	  private Double superficialArea;       //表面积
+	  private Double space;                 //体积
+	  private String spaceUnit;            //体积单位
+	  private String superficialAreaUnit;  //表面积单位
+	  private Double price;                //材料价格
+	  private Double productProcessPrice;  //产品工艺价格
+	  private Double profitManagment;      //利润管理费
+	  private Double profitRate;           //利润率
+	  private Double tax;                  //税费
+	  private Double unitPrice;            //产品单价
+	  private Integer insideOutsideState;  //单表面还是可选择表面(0：单面 1：双面）
+	  private String selectUnit;           //客户选择的单位
+	  private String productSizeInch;       //产品参数inch
+	  
+	  
+	  
+	  private List<ProcessDetails> processDetails;  
+	  
+	
+	  
+	  
+
+	public String getProductSizeInch() {
+		return productSizeInch;
+	}
+	public void setProductSizeInch(String productSizeInch) {
+		this.productSizeInch = productSizeInch;
+	}
+	public String getSelectUnit() {
+		return selectUnit;
+	}
+	public void setSelectUnit(String selectUnit) {
+		this.selectUnit = selectUnit;
+	}
+	public Integer getInsideOutsideState() {
+		return insideOutsideState;
+	}
+	public void setInsideOutsideState(Integer insideOutsideState) {
+		this.insideOutsideState = insideOutsideState;
+	}
+	public List<ProcessDetails> getProcessDetails() {
+		return processDetails;
+	}
+	public void setProcessDetails(List<ProcessDetails> processDetails) {
+		this.processDetails = processDetails;
+	}
+	public Double getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(Double unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	public Double getTax() {
+		return tax;
+	}
+	public void setTax(Double tax) {
+		this.tax = tax;
+	}
+	public Double getProductProcessPrice() {
+		return productProcessPrice;
+	}
+	public void setProductProcessPrice(Double productProcessPrice) {
+		this.productProcessPrice = productProcessPrice;
+	}
+	public Double getProfitManagment() {
+		return profitManagment;
+	}
+	public void setProfitManagment(Double profitManagment) {
+		this.profitManagment = profitManagment;
+	}
+
+	public Double getProfitRate() {
+		return profitRate;
+	}
+	public void setProfitRate(Double profitRate) {
+		this.profitRate = profitRate;
+	}
+	public String getProductSize() {
+		return productSize;
+	}
+	public void setProductSize(String productSize) {
+		this.productSize = productSize;
+	}
+	public Double getPrice() {
+		return price;
+	}
+	public void setPrice(Double price) {
+		this.price = price;
+	}
+	public Double getSpace() {
+		return space;
+	}
+	public void setSpace(Double space) {
+		this.space = space;
+	}
+	public String getSpaceUnit() {
+		return spaceUnit;
+	}
+	public void setSpaceUnit(String spaceUnit) {
+		this.spaceUnit = spaceUnit;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+
+	public String getQuoteId() {
+		return quoteId;
+	}
+	public void setQuoteId(String quoteId) {
+		this.quoteId = quoteId;
+	}
+	public String getPartName() {
+		return partName;
+	}
+	public void setPartName(String partName) {
+		this.partName = partName;
+	}
+	public Integer getGoodsTypeId() {
+		return goodsTypeId;
+	}
+	public void setGoodsTypeId(Integer goodsTypeId) {
+		this.goodsTypeId = goodsTypeId;
+	}
+	public Integer getMaterialId() {
+		return materialId;
+	}
+	public void setMaterialId(Integer materialId) {
+		this.materialId = materialId;
+	}
+	public String getParameterMm() {
+		return parameterMm;
+	}
+	public void setParameterMm(String parameterMm) {
+		this.parameterMm = parameterMm;
+	}
+	public String getParameterInch() {
+		return parameterInch;
+	}
+	public void setParameterInch(String parameterInch) {
+		this.parameterInch = parameterInch;
+	}
+	public Integer getGoodsSet() {
+		return goodsSet;
+	}
+	public void setGoodsSet(Integer goodsSet) {
+		this.goodsSet = goodsSet;
+	}
+	public Double getWeight() {
+		return weight;
+	}
+	public void setWeight(Double weight) {
+		this.weight = weight;
+	}
+	public String getWeightUnit() {
+		return weightUnit;
+	}
+	public void setWeightUnit(String weightUnit) {
+		this.weightUnit = weightUnit;
+	}
+	public Double getSuperficialArea() {
+		return superficialArea;
+	}
+	public void setSuperficialArea(Double superficialArea) {
+		this.superficialArea = superficialArea;
+	}
+	public String getSuperficialAreaUnit() {
+		return superficialAreaUnit;
+	}
+	public void setSuperficialAreaUnit(String superficialAreaUnit) {
+		this.superficialAreaUnit = superficialAreaUnit;
+	}
+	@Override
+	public String toString() {
+		return "OrderDetails [id=" + id + ", quoteId=" + quoteId
+				+ ", partName=" + partName + ", goodsTypeId=" + goodsTypeId
+				+ ", materialId=" + materialId + ", parameterMm=" + parameterMm
+				+ ", productSize=" + productSize + ", parameterInch="
+				+ parameterInch + ", goodsSet=" + goodsSet + ", weight="
+				+ weight + ", weightUnit=" + weightUnit + ", superficialArea="
+				+ superficialArea + ", space=" + space + ", spaceUnit="
+				+ spaceUnit + ", superficialAreaUnit=" + superficialAreaUnit
+				+ ", price=" + price + ", productProcessPrice="
+				+ productProcessPrice + ", profitManagment=" + profitManagment
+				+ ", profitRate=" + profitRate + ", tax=" + tax
+				+ ", unitPrice=" + unitPrice + ", insideOutsideState="
+				+ insideOutsideState + ", selectUnit=" + selectUnit
+				+ ", productSizeInch=" + productSizeInch + ", processDetails="
+				+ processDetails + "]";
+	}
+	  
+	  
+	  
+}

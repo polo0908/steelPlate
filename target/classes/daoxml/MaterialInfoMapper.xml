@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.MaterialInfoMapper">
+	<resultMap id="materialInfoResultMap" type="com.cal.bean.MaterialInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+		<result column="material_type" property="materialType" jdbcType="VARCHAR" />
+		<result column="density" property="density" jdbcType="DOUBLE" />
+		<result column="density_unit" property="densityUnit" jdbcType="VARCHAR" />
+	    <result column="unit_price" property="unitPrice" jdbcType="INTEGER" />
+	    <result column="din" property="din" jdbcType="VARCHAR" />
+	    <result column="astm" property="astm" jdbcType="VARCHAR" />
+	    <result column="update_date" property="updateDate" jdbcType="DATE" />
+	    
+	    <result column="price_replace" property="priceReplace" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<sql id="materialInfoColumnList">
+		id,goods_type,material_type,density, density_unit,unit_price,din,astm,update_date,price_replace
+	</sql>
+
+	<select id="queryById" resultMap="materialInfoResultMap"
+		parameterType="java.lang.Integer">
+		select 
+		<include refid="materialInfoColumnList" />
+		from material_info  
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryByGoodsType" resultMap="materialInfoResultMap" parameterType="string">
+	    select 
+		<include refid="materialInfoColumnList" />
+		from material_info  
+		where goods_type = #{goodsType,jdbcType=VARCHAR}
+<!-- 		order by convert(material_type using gbk) ASC -->
+	</select>
+	
+	<select id="queryByType" resultMap="materialInfoResultMap">
+	    select 
+		<include refid="materialInfoColumnList" />
+		from material_info 
+		where 
+		material_type = #{materialType,jdbcType=VARCHAR}
+		and 
+		goods_type = #{goodsType,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 根据材质类型去重查询 -->
+	<select id="queryAllGroupByType" resultMap="materialInfoResultMap">
+	    select  
+	    <include refid="materialInfoColumnList" />  
+		from material_info 
+		group by material_type
+	</select>
+
+    <!-- 根据材质类型更新价格 -->
+     <update id="updateMaterialPriceByType">
+        update material_info  
+        set  
+        unit_price = #{unitPrice,jdbcType=INTEGER}, update_date = #{updateDate,jdbcType=DATE}   
+        where material_type = #{materialType,jdbcType=VARCHAR}
+     </update>
+</mapper>

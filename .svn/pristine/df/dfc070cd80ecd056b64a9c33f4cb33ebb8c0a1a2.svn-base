@@ -1,0 +1,14 @@
+package com.cal.util;
+
+import java.text.DecimalFormat;
+
+public class NumberFormat {
+  
+	
+	public static String number(Integer num){
+		
+		DecimalFormat df=new DecimalFormat("0000000");
+		
+		return df.format(num);
+	}
+}

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.ProcessDetailsMapper">
+	<resultMap id="processDetailsResultMap" type="com.cal.bean.ProcessDetails">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="order_details_id" property="orderDetailsId" jdbcType="INTEGER" />
+		<result column="goods_process_id" property="goodsProcessId" jdbcType="INTEGER" />
+		<result column="level1_parameter" property="level1Parameter" jdbcType="VARCHAR" />
+		<result column="level2_parameter" property="level2Parameter" jdbcType="VARCHAR" />
+		<result column="level3_parameter" property="level3Parameter" jdbcType="DOUBLE" />
+		<result column="unit_price" property="unitPrice" jdbcType="DOUBLE" />
+		<result column="unit" property="unit" jdbcType="VARCHAR" />
+		<result column="outside_surface" property="outsideSurface" jdbcType="INTEGER" />
+		<result column="inside_surface" property="insideSurface" jdbcType="INTEGER" />
+		<result column="process_price" property="processPrice" jdbcType="DOUBLE" />
+
+	</resultMap>
+
+	<sql id="processDetailsColumnList">
+		id,order_details_id,goods_process_id, level1_parameter,level2_parameter,level3_parameter, 
+		unit_price,unit,outside_surface,inside_surface ,process_price
+	</sql>
+
+	<select id="queryById" resultMap="processDetailsResultMap"
+		parameterType="java.lang.Integer">
+		select 
+		<include refid="processDetailsColumnList" />
+		from process_details  
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryAll" resultMap="processDetailsResultMap">
+	    select 
+		<include refid="processDetailsColumnList" />
+		from process_details 
+	</select>
+	
+
+	<insert id="insertProcess" parameterType="com.cal.bean.ProcessDetails">
+		insert into process_details 
+		(
+		order_details_id,goods_process_id, level1_parameter,
+		level2_parameter,level3_parameter, 
+		unit_price,unit,outside_surface,inside_surface,process_price
+		)
+		values 
+		(
+		#{orderDetailsId,jdbcType=INTEGER},
+		#{goodsProcessId,jdbcType=INTEGER},
+		#{level1Parameter,jdbcType=VARCHAR},
+		#{level2Parameter,jdbcType=VARCHAR},
+		#{level3Parameter,jdbcType=DOUBLE},
+		#{unitPrice,jdbcType=DOUBLE},
+		#{unit,jdbcType=VARCHAR},		
+		#{outsideSurface,jdbcType=INTEGER},
+		#{insideSurface,jdbcType=INTEGER},
+		#{processPrice,jdbcType=DOUBLE}
+		)
+		
+	</insert>
+	
+    <select id="queryByOrderDetailsId" resultMap="processDetailsResultMap" parameterType="int">
+        select
+        <include refid="processDetailsColumnList" />
+		from process_details 
+		where order_details_id = #{orderDetailsId,jdbcType=INTEGER}
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="insertProcessDetails" parameterType="ArrayList">
+        insert into process_details  
+        (
+		order_details_id,goods_process_id, level1_parameter,
+		level2_parameter,level3_parameter, 
+		unit_price,unit,outside_surface,inside_surface,process_price
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+		 (
+		  #{item.orderDetailsId},
+		  #{item.goodsProcessId},
+		  #{item.level1Parameter},
+		  #{item.level2Parameter},
+		  #{item.level3Parameter},
+		  #{item.unitPrice},
+		  #{item.unit},
+		  #{item.outsideSurface},
+		  #{item.insideSurface},
+		  #{item.processPrice}	
+		  )
+		</foreach>
+        
+    </insert>
+    
+    <!-- 根据OrderDetailsId删除 -->
+    <delete id="deleteByOrderDetailsId" parameterType="int">
+        delete from process_details
+        where order_details_id = #{orderDetailsId,jdbcType=INTEGER}
+        
+    </delete>  
+      
+      
+</mapper>

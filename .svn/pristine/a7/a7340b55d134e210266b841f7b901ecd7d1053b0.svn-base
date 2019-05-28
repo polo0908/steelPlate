@@ -1,0 +1,30 @@
+package com.cal.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.cal.bean.MaterialInfo;
+
+public interface MaterialInfoMapper {
+	
+	/**
+	 * 查询产品对应材料信息
+	 * @return
+	 */
+	List<MaterialInfo> queryByGoodsType(String goodsType);
+	
+	/**
+	 * 根据id查询产品信息
+	 * @param id
+	 * @return
+	 */
+	MaterialInfo queryById(Integer id);
+	/**
+	 * 根据materialType查询产品信息
+	 * @param materialType
+	 * @return
+	 */
+	MaterialInfo queryByType(@Param("materialType") String materialType,@Param("goodsType")String goodsType);
+
+}

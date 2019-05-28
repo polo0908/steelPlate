@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.ClientOrderMapper">
+	<resultMap id="clientOrderResultMap" type="com.cal.bean.ClientOrder">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="quoteId" property="quoteId" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="IP" property="ip" jdbcType="VARCHAR" />
+		<result column="company_name" property="companyName" jdbcType="VARCHAR" />
+		<result column="email" property="email" jdbcType="VARCHAR" />
+		<result column="total_sets" property="totalSets" jdbcType="INTEGER" />
+		<result column="total_weight" property="totalWeight" jdbcType="DOUBLE" />
+		<result column="total_space" property="totalSpace" jdbcType="DOUBLE" />
+		<result column="weight_unit" property="weightUnit" jdbcType="VARCHAR" />
+		<result column="space_unit" property="spaceUnit" jdbcType="VARCHAR" />
+		<result column="total_price" property="totalPrice" jdbcType="DOUBLE" />
+		<result column="country" property="country" jdbcType="VARCHAR" />
+		<result column="city" property="city" jdbcType="VARCHAR" />
+		<result column="fob_price" property="fobPrice" jdbcType="DOUBLE" />
+		<result column="cif_price" property="cifPrice" jdbcType="DOUBLE" />
+		<result column="userId" property="userId" jdbcType="INTEGER" />
+		<result column="profit_managment" property="profitManagment" jdbcType="DOUBLE" />
+		<result column="profit_rate" property="profitRate" jdbcType="DOUBLE" />
+		<result column="tax" property="tax" jdbcType="DOUBLE" />
+		<result column="shipping_fee" property="shippingFee" jdbcType="DOUBLE" />
+		<result column="discount" property="discount" jdbcType="DOUBLE" />
+		<result column="finally_price" property="finallyPrice" jdbcType="DOUBLE" />
+		<result column="mode_of_transport" property="modeOfTransport" jdbcType="VARCHAR" />
+		<result column="packing" property="packing" jdbcType="DOUBLE" />
+		<result column="amount_unit" property="amountUnit" jdbcType="INTEGER" />
+		<result column="select_unit_price" property="selectUnitPrice" jdbcType="DOUBLE"/>				
+		<result column="shipping_fee_lcl" property="shippingFeeLcl" jdbcType="DOUBLE" />
+		<result column="shipping_fee_fcl" property="shippingFeeFcl" jdbcType="DOUBLE" />
+		<result column="inland_shipping_cost" property="inlandShippingCost" jdbcType="DOUBLE" />
+		<result column="order_plan" property="orderPlan" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<sql id="clientOrderColumnList">
+		id,username,quoteId, create_time,IP,
+		company_name,email,total_sets,
+		total_weight,total_space,weight_unit,space_unit, total_price,
+		country,city,fob_price,cif_price,userId,profit_managment,profit_rate,tax,shipping_fee,
+		shipping_fee_lcl,shipping_fee_fcl,discount,finally_price,mode_of_transport,packing,amount_unit,
+		select_unit_price,inland_shipping_cost,order_plan
+	</sql>
+
+	<select id="queryById" resultMap="clientOrderResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="clientOrderColumnList" />
+		from client_order
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<select id="queryByQuoteId" resultMap="clientOrderResultMap"
+		parameterType="string">
+		select
+		<include refid="clientOrderColumnList" />
+		from client_order
+		where quoteId = #{quoteId,jdbcType=VARCHAR}
+	</select>
+	
+	
+	<select id="queryAllData" resultMap="clientOrderResultMap">
+	    select
+		<include refid="clientOrderColumnList" />
+		from client_order
+		where IP not in ("112.64.174.34","180.173.93.70") 
+		and  
+		DATE_SUB(CURDATE(), INTERVAL 1 MONTH) &lt;= date(create_time) 
+		order by create_time desc 
+	</select>
+	
+
+	<insert id="insertClientOrder" useGeneratedKeys="true" keyProperty="id" parameterType="com.cal.bean.ClientOrder">
+
+		insert into client_order (
+		id,username,quoteId,create_time,IP,
+		company_name,email,
+		total_sets,
+		total_weight,total_space,
+		weight_unit,space_unit,total_price,
+		country,city,fob_price,cif_price,userId,amount_unit,inland_shipping_cost)
+		values 
+		(
+		#{id,jdbcType=INTEGER},
+		#{username,jdbcType=VARCHAR},
+		#{quoteId,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},
+		#{ip,jdbcType=VARCHAR},
+		#{companyName,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{totalSets,jdbcType=INTEGER},
+		#{totalWeight,jdbcType=DOUBLE},		
+		#{totalSpace,jdbcType=DOUBLE},
+		#{weightUnit,jdbcType=VARCHAR},
+		#{spaceUnit,jdbcType=VARCHAR},
+		#{totalPrice,jdbcType=DOUBLE},
+		#{country,jdbcType=VARCHAR},
+		#{city,jdbcType=VARCHAR},
+		#{fobPrice,jdbcType=DOUBLE},
+		#{cifPrice,jdbcType=DOUBLE},
+		#{userId,jdbcType=INTEGER},
+		#{amountUnit,jdbcType=INTEGER},
+		#{inlandShippingCost,jdbcType=DOUBLE}
+		)
+	</insert>
+	
+	<update id="updateClientOrder" parameterType="com.cal.bean.ClientOrder">
+	    update client_order 
+	    <set> 
+	    <if test="quoteId != null">
+			quoteId = #{quoteId,jdbcType=VARCHAR},
+		</if>
+	    <if test="username != null">
+			username = #{username,jdbcType=VARCHAR},
+		</if>
+	    <if test="userId != null">
+			userId = #{userId,jdbcType=INTEGER},
+		</if>
+	    <if test="createTime != null">
+			create_time = #{createTime,jdbcType=TIMESTAMP},
+		</if>
+	    <if test="companyName != null">
+			company_name = #{companyName,jdbcType=VARCHAR},
+		</if>
+	    <if test="email != null">
+			email = #{email,jdbcType=VARCHAR},
+		</if>
+	    <if test="totalSets != null">
+			total_sets = #{totalSets,jdbcType=INTEGER},
+		</if>
+	    <if test="totalWeight != null">
+			total_weight = #{totalWeight,jdbcType=DOUBLE},
+		</if>
+	    <if test="totalSpace != null">
+			total_space = #{totalSpace,jdbcType=DOUBLE},
+		</if>
+	    <if test="totalPrice != null">
+			total_price = #{totalPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="country != null">
+			country = #{country,jdbcType=VARCHAR},
+		</if>
+	    <if test="city != null">
+			city = #{city,jdbcType=VARCHAR},
+		</if>
+	    <if test="fobPrice != null">
+			fob_price = #{fobPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="cifPrice != null">
+			cif_price = #{cifPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="profitManagment != null">
+			profit_managment = #{profitManagment,jdbcType=DOUBLE},
+		</if>
+	    <if test="profitRate != null">
+			profit_rate = #{profitRate,jdbcType=DOUBLE},
+		</if>
+	    <if test="tax != null">
+			tax = #{tax,jdbcType=DOUBLE},
+		</if>
+	    <if test="shippingFee != null">
+			shipping_fee = #{shippingFee,jdbcType=DOUBLE},
+		</if>
+	    <if test="amountUnit != null">
+			amount_unit = #{amountUnit,jdbcType=INTEGER},
+		</if>
+	    <if test="shippingFeeLcl != null">
+			shipping_fee_lcl = #{shippingFeeLcl,jdbcType=DOUBLE},
+		</if>
+	    <if test="shippingFeeFcl != null">
+			shipping_fee_fcl = #{shippingFeeFcl,jdbcType=DOUBLE},
+		</if>
+	    <if test="discount != null">
+			discount = #{discount,jdbcType=DOUBLE},
+		</if>
+	    <if test="finallyPrice != null">
+			finally_price = #{finallyPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="packing != null">
+			packing = #{packing,jdbcType=DOUBLE},
+		</if>
+	    <if test="modeOfTransport != null">
+			mode_of_transport = #{modeOfTransport,jdbcType=VARCHAR},
+		</if>
+	    <if test="inlandShippingCost != null">
+			inland_shipping_cost = #{inlandShippingCost,jdbcType=DOUBLE},
+		</if>
+	    <if test="orderPlan != null">
+			order_plan = #{orderPlan,jdbcType=VARCHAR},
+		</if>
+
+
+	    </set>
+		 where id = #{id,jdbcType=INTEGER}
+		
+	</update>
+
+</mapper>

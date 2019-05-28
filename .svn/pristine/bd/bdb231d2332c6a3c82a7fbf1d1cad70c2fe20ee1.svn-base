@@ -1,0 +1,754 @@
+package com.cal.controller;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cal.bean.AmountUnit;
+import com.cal.bean.ClientOrder;
+import com.cal.bean.GoodsTypeInfo;
+import com.cal.bean.GoodsTypeNormal;
+import com.cal.bean.MaterialInfo;
+import com.cal.bean.OrderDetails;
+import com.cal.bean.ProcessDetails;
+import com.cal.bean.ProcessInfo;
+import com.cal.service.AmountUnitService;
+import com.cal.service.ClientOrderService;
+import com.cal.service.GoodsTypeInfoService;
+import com.cal.service.GoodsTypeNormalService;
+import com.cal.service.MaterialInfoService;
+import com.cal.service.OrderDetailsService;
+import com.cal.service.ProcessDetailsService;
+import com.cal.service.ProcessInfoService;
+import com.cal.service.ProfitManagmentService;
+import com.cal.util.DateFormat;
+import com.cal.util.NumberFormat;
+
+
+
+@Controller
+@RequestMapping("/calculator")
+public class GoodsTypeInfoController {
+
+	public static Logger logger = Logger.getLogger(GoodsTypeInfoController.class);
+	
+       @Resource
+       private GoodsTypeInfoService goodsTypeInfoService;
+       @Resource
+       private MaterialInfoService materialInfoService;
+       @Resource
+       private OrderDetailsService orderDetailsService;
+       @Resource
+       private ClientOrderService clientOrderService;
+       @Resource
+       private AmountUnitService amountUnitService;
+       @Resource
+       private ProfitManagmentService profitManagmentService;
+       @Resource
+       private ProcessDetailsService processDetailsService;
+       @Resource
+       private ProcessInfoService processInfoService;
+       @Resource
+       private GoodsTypeNormalService goodsTypeNormalService;
+       
+       
+       private static final int GOODS_TYPE_ID = 0;
+       /**
+        * 查询所有产品和材料
+        * @param request
+        * @param response
+        * @return
+        */
+       @RequestMapping("/queryAll.do")
+       public String queryAll(HttpServletRequest request, HttpServletResponse response){
+    	   try {
+			   List<GoodsTypeInfo> goodsTypeInfos = goodsTypeInfoService.queryAll();
+			   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryById(0);
+			   List<MaterialInfo> materialInfos = materialInfoService.queryByGoodsType("Plates");
+			   for (MaterialInfo materialInfo : materialInfos) {
+				   if(!(materialInfo.getUpdateDate() == null || "".equals(materialInfo.getUpdateDate()))){
+				   materialInfo.setUpdateDate(DateFormat.formatDate3(materialInfo.getUpdateDate()));
+		      	   }
+			   }	   
+			   List<AmountUnit> amountUnits = amountUnitService.queryAll();
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand("USD");
+			   AmountUnit amountUnit = amountUnitService.queryByCurrencyShorthand("CNY");
+			   Map<Object, Object> map = calculateUnitPrice("AISI 1008(08F)", "Plates", a.getExchangeRate());
+			   List<GoodsTypeNormal> goodsTypeNormals = goodsTypeNormalService.queryByGoodsTypeInfoId(GOODS_TYPE_ID);
+			   request.setAttribute("goodsTypeNormals", goodsTypeNormals);
+			   request.setAttribute("amountUnits", amountUnits);
+			   request.setAttribute("goodsTypeInfo", goodsTypeInfo);
+			   request.setAttribute("goodsTypeInfos", goodsTypeInfos);
+			   request.setAttribute("materialInfos", materialInfos);
+			   request.setAttribute("price", map.get("price"));
+			   request.setAttribute("amountUnit", amountUnit);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+    	   
+    	   return "calculator.jsp";
+       }
+       
+       /**
+        * 跳转增加产品界面
+        * @param request
+        * @param response
+        * @return
+        */
+       @RequestMapping("/toIncreaseProduct.do")
+       public String toIncreaseProduct(HttpServletRequest request, HttpServletResponse response){
+    	   try {
+			String quoteId = request.getParameter("quoteId");    
+			   List<GoodsTypeInfo> goodsTypeInfos = goodsTypeInfoService.queryAll();
+			   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryById(0);
+			   List<MaterialInfo> materialInfos = materialInfoService.queryByGoodsType("Plates");
+			   for (MaterialInfo materialInfo : materialInfos) {
+				   if(!(materialInfo.getUpdateDate() == null || "".equals(materialInfo.getUpdateDate()))){
+				   materialInfo.setUpdateDate(DateFormat.formatDate3(materialInfo.getUpdateDate()));
+		      	   }
+			   }	   
+			   List<AmountUnit> amountUnits = amountUnitService.queryAll();
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand("USD");
+			   Map<Object, Object> map = calculateUnitPrice("AISI 1008(08F)", "Plates", a.getExchangeRate());
+			   AmountUnit amountUnit = amountUnitService.queryByCurrencyShorthand("CNY");  
+			   List<GoodsTypeNormal> goodsTypeNormals = goodsTypeNormalService.queryByGoodsTypeInfoId(GOODS_TYPE_ID);
+			   
+			   request.setAttribute("goodsTypeNormals", goodsTypeNormals);
+			   request.setAttribute("amountUnits", amountUnits);
+			   request.setAttribute("goodsTypeInfo", goodsTypeInfo);
+			   request.setAttribute("goodsTypeInfos", goodsTypeInfos);
+			   request.setAttribute("materialInfos", materialInfos);
+			   request.setAttribute("price", map.get("price"));
+			   request.setAttribute("quoteId", quoteId);
+			   request.setAttribute("amountUnit", amountUnit);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+    	   
+    	   return "calculator_increase.jsp";   
+       }
+       
+       
+       /**
+        * 订单增加产品方法
+        * @author polo
+        * 2017年5月11日
+        *
+        */
+       @ResponseBody
+       @RequestMapping("/increaseProduct.do")
+       public JsonResult<Object> increaseProduct(HttpServletRequest request, HttpServletResponse response){
+    	   OrderDetails orderDetails = new OrderDetails();
+    	  try {			   
+			  String quoteId = request.getParameter("quoteId"); 
+			  ClientOrder clientOrder = clientOrderService.queryByQuoteId(quoteId);
+			  List<OrderDetails> list = orderDetailsService.queryByQuoteId(quoteId);
+			  
+			  String currencyShorthand = request.getParameter("currencyShorthand");
+			   String goodsType = request.getParameter("goodsType");
+			   Integer goodsTypeId = 0;
+			   Integer insideOutsideState = 0;
+			   if(!(goodsType == null || "".equals(goodsType))){
+				   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType); 
+				   goodsTypeId = goodsTypeInfo.getId();	
+				   insideOutsideState = goodsTypeInfo.getInsideOutsideState();
+			   }
+			   
+			   String parameterMm = request.getParameter("parameterMm");
+			   String parameterInch = request.getParameter("parameterInch");
+			   
+			   Double density = 0.0;
+			   String materialType = request.getParameter("materialType");
+			   Integer materialInfoId = 0;
+			   if(!(materialType == null || "".equals(materialType))){
+				   MaterialInfo materialInfo = materialInfoService.queryByType(materialType,goodsType);	
+				   materialInfoId = materialInfo.getId();
+				   density = materialInfo.getDensity();
+			   }
+			   
+			   Integer quantity = 1; 
+			   if(!(request.getParameter("quantity") == null || "".equals(request.getParameter("quantity")))){
+				   quantity = Integer.parseInt(request.getParameter("quantity"));
+			   }			   
+			   
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand(currencyShorthand);
+			   Integer priceUnit = Integer.parseInt(calculateUnitPrice(materialType, goodsType, a.getExchangeRate()).get("price").toString());
+			   
+			   orderDetails =  CalculatingProduct.calculate(parameterMm, priceUnit, goodsTypeId, quantity, density);
+			   orderDetails.setGoodsTypeId(goodsTypeId);
+			   orderDetails.setMaterialId(materialInfoId);
+			   orderDetails.setParameterMm(parameterMm);
+			   orderDetails.setParameterInch(parameterInch);
+			   orderDetails.setProductProcessPrice(0.0);
+			   orderDetails.setQuoteId(quoteId);
+			   orderDetails.setInsideOutsideState(insideOutsideState);
+			   
+			   String partName = "Part1";
+			   if(list.size() != 0){
+				   Integer n = list.size()+1;
+				   partName = "Part"+n;
+			   }
+			   if(!(request.getParameter("partName") == null || "".equals(request.getParameter("partName")))){
+				   partName = request.getParameter("partName");
+			   }
+			   orderDetails.setPartName(partName);
+			   orderDetails.setGoodsSet(quantity);
+			   Double totalPrice = 0.0;
+			   Double totalSpace = 0.0;
+			   Double totalWeight = 0.0;
+			   if(!(clientOrder.getTotalPrice() == null || "".equals(clientOrder.getTotalPrice()))){
+				   totalPrice = clientOrder.getTotalPrice();
+			   }
+			   if(!(clientOrder.getTotalSpace() == null || "".equals(clientOrder.getTotalSpace()))){
+				   totalSpace = clientOrder.getTotalSpace();
+			   }
+			   if(!(clientOrder.getTotalWeight() == null || "".equals(clientOrder.getTotalWeight()))){
+				   totalWeight = clientOrder.getTotalWeight();
+			   }
+			   totalPrice = new BigDecimal(orderDetails.getPrice()).multiply(new BigDecimal(orderDetails.getGoodsSet())).add(new BigDecimal(totalPrice)).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+			   totalSpace = new BigDecimal(orderDetails.getSpace()).multiply(new BigDecimal(orderDetails.getGoodsSet())).add(new BigDecimal(totalSpace)).setScale(7, BigDecimal.ROUND_HALF_UP).doubleValue();
+			   totalWeight = new BigDecimal(orderDetails.getWeight()).multiply(new BigDecimal(orderDetails.getGoodsSet())).add(new BigDecimal(totalWeight)).setScale(7, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+			   clientOrder.setTotalPrice(totalPrice);
+			   clientOrder.setTotalSpace(totalSpace);
+			   clientOrder.setTotalWeight(totalWeight);	
+			   
+			   orderDetailsService.insertOrderDetails(orderDetails,clientOrder);
+               
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		} 	      	   
+    	  return new JsonResult<Object>(orderDetails);
+       }
+       
+       
+       /**
+        * 
+        * @param request
+        * @param response
+        * @return
+        */
+       @ResponseBody
+       @RequestMapping("/queryByCurrencyShorthand.do")
+       public Map<String,Object> queryByCurrencyShorthand(HttpServletRequest request, HttpServletResponse response){
+    	   Map<String, Object> map = null;
+		try {
+			String currencyShorthand = request.getParameter("currencyShorthand");
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand(currencyShorthand);
+			   String goodsType = request.getParameter("goodsType");
+			   String materialType = request.getParameter("materialType");
+			   Integer price = Integer.parseInt(calculateUnitPrice(materialType, goodsType, a.getExchangeRate()).get("price").toString());
+			   Double exchangeRate = a.getExchangeRate();
+			   map = new HashMap<String,Object>();
+			   map.put("price", price);
+			   map.put("exchangeRate", exchangeRate);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+    	   return map;
+       }
+       
+       /**
+        * 根据产品类型和材质查询单价
+        * @param request
+        * @param response
+        * @return
+        */
+       @ResponseBody
+       @RequestMapping("/queryUnitPriceByMaterialInfo.do")
+       public JsonResult<Map<Object,Object>> queryUnitPriceByMaterialInfo(HttpServletRequest request, HttpServletResponse response){
+    	   Integer price = 0;
+		try {
+			   String currencyShorthand = request.getParameter("currencyShorthand");
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand(currencyShorthand);
+			   String goodsType = request.getParameter("goodsType");
+//			   String materialType = request.getParameter("materialType");
+			   String materialType = new String(request.getParameter("materialType").getBytes("ISO-8859-1"), "UTF-8");
+			   Map<Object, Object> map = calculateUnitPrice(materialType, goodsType, a.getExchangeRate());
+			   return new JsonResult<Map<Object,Object>>(map);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+			return new JsonResult<Map<Object,Object>>(1,"获取失败");
+		}
+       }
+       
+       
+       /**
+        * 根据产品类型查询
+        * @author polo
+        * 2017年5月11日
+        *
+        */
+       @ResponseBody
+       @RequestMapping("/queryByGoodsType.do")
+       public JsonResult<Map<Object,Object>> queryByGoodsType(HttpServletRequest request, HttpServletResponse response){
+    	    Map<Object, Object> map = null;
+			try {
+				String currencyShorthand = request.getParameter("currencyShorthand");
+				String goodsType = request.getParameter("goodsType");
+				GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType);			
+				   String goodsImage = null;
+				   List<GoodsTypeNormal> goodsTypeNormals = new ArrayList<GoodsTypeNormal>();
+				   if(goodsTypeInfo != null && !"".equals(goodsImage)){
+					  goodsImage = goodsTypeInfo.getGoodsImage(); 
+					  goodsTypeNormals = goodsTypeNormalService.queryByGoodsTypeInfoId(goodsTypeInfo.getId());
+				   }
+				   map = new HashMap<Object, Object>();
+				   List<MaterialInfo>  materialInfos = materialInfoService.queryByGoodsType(goodsType);
+				   for (MaterialInfo materialInfo : materialInfos) {
+					   if(!(materialInfo.getUpdateDate() == null || "".equals(materialInfo.getUpdateDate()))){
+					   materialInfo.setUpdateDate(DateFormat.formatDate3(materialInfo.getUpdateDate()));
+			      	   }
+				   }	   
+				   AmountUnit a = amountUnitService.queryByCurrencyShorthand(currencyShorthand);
+				   Integer unitPrice = Integer.parseInt(calculateUnitPrice(materialInfos.get(0).getMaterialType(), goodsType, a.getExchangeRate()).get("price").toString());
+				   map.put("unitPrice", unitPrice);
+				   map.put("goodsImage", goodsImage);
+				   map.put("materialInfos", materialInfos);
+				   map.put("originalParameter", goodsTypeInfo.getOriginalParameter());
+				   map.put("goodsTypeNormals", goodsTypeNormals);
+				   
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				e.printStackTrace();
+			}
+
+    	   
+    	   return new JsonResult<Map<Object,Object>>(map); 
+       }
+       
+       
+       /**
+        * 根据类型查询标准类型
+        * @author polo
+        * 2017年5月31日
+        *
+        */
+       @ResponseBody
+       @RequestMapping("/queryStandardByGoodsTypeId.do")
+       public JsonResult< Map<String,Object>> queryStandardByGoodsTypeId(HttpServletRequest request, HttpServletResponse response){
+    	   
+    	    Map<String, Object> map = new HashMap<String, Object>();
+			try {
+				String goodsType = request.getParameter("goodsType");
+				   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType);			
+				   List<GoodsTypeNormal> goodsTypeNormals = new ArrayList<GoodsTypeNormal>();
+				   List<List<String>> list = new ArrayList<List<String>>();
+				   
+				   if(goodsTypeInfo != null){
+					  goodsTypeNormals = goodsTypeNormalService.queryByGoodsTypeInfoId(goodsTypeInfo.getId());
+					  for (GoodsTypeNormal goodsTypeNormal : goodsTypeNormals) {
+						  List<String> list1 = new ArrayList<String>();
+						  String[] parameters = goodsTypeNormal.getParameterNormal().split(",");
+						  for(int i = 0;i< parameters.length;i++){
+								  String parameter = parameters[i];  
+								  list1.add(parameter);					  
+						  }
+						  list.add(list1);
+					  }
+				   }				   
+				   map.put("goodsTypeNormals", goodsTypeNormals);
+				   map.put("list", list);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				e.printStackTrace();
+			}
+    	   
+    	 return new JsonResult<Map<String,Object>>(map);  
+       }
+       
+       
+       
+       /**
+        * 根据标准参数的id查询
+        * @author polo
+        * 2017年5月31日
+        *
+        */
+       @ResponseBody
+       @RequestMapping("/queryByStandardId.do")
+       public JsonResult<GoodsTypeNormal> queryByStandardId(HttpServletRequest request, HttpServletResponse response){
+    	   
+    	   try {
+			if(request.getParameter("standardId") == null || "".equals(request.getParameter("standardId"))){
+				   throw new RuntimeException("未获取到标准参数");
+			   }
+			   Integer standardId = Integer.parseInt(request.getParameter("standardId"));
+			   GoodsTypeNormal goodsTypeNormal = goodsTypeNormalService.queryById(standardId);
+			   
+			   return new JsonResult<GoodsTypeNormal>(goodsTypeNormal);
+		} catch (NumberFormatException e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+			return new JsonResult<GoodsTypeNormal>(1,"查询失败");
+		}
+    	   
+       }
+       
+       
+       /**
+        * 初始保存订单
+        * @param request
+        * @param response
+        * @return
+        */
+       @ResponseBody
+       @RequestMapping("/saveClientOrder.do")
+       public JsonResult<Object> saveClientOrder(HttpServletRequest request, HttpServletResponse response){
+    	OrderDetails orderDetails = null;    	   
+		try {
+			  ClientOrder clientOrder = new ClientOrder();
+			  String currencyShorthand = request.getParameter("currencyShorthand");
+			   String goodsType = request.getParameter("goodsType");
+			   Integer goodsTypeId = 0;
+			   Integer insideOutsideState = 0;
+			   if(!(goodsType == null || "".equals(goodsType))){
+				   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType); 
+				   goodsTypeId = goodsTypeInfo.getId();	
+				   insideOutsideState = goodsTypeInfo.getInsideOutsideState();
+			   }
+			   
+			   String parameterMm = request.getParameter("parameterMm");
+			   String parameterInch = request.getParameter("parameterInch");
+			   
+			   Double density = 0.0;
+			   String materialType = request.getParameter("materialType");
+			   Integer materialInfoId = 0;
+			   if(!(materialType == null || "".equals(materialType))){
+				   MaterialInfo materialInfo = materialInfoService.queryByType(materialType,goodsType);	
+				   materialInfoId = materialInfo.getId();
+				   density = materialInfo.getDensity();
+			   }
+			   
+			   Integer quantity = 1; 
+			   if(!(request.getParameter("quantity") == null || "".equals(request.getParameter("quantity")))){
+				   quantity = Integer.parseInt(request.getParameter("quantity"));
+			   }			   
+			   clientOrder.setTotalSets(1);
+			   
+			   String ipAddr = request.getRemoteAddr();
+			   clientOrder.setIp(ipAddr);
+			   clientOrder.setCreateTime(DateFormat.format());  
+			   
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand(currencyShorthand);
+			   Integer priceUnit = Integer.parseInt(calculateUnitPrice(materialType, goodsType, a.getExchangeRate()).get("price").toString());
+			   
+			   orderDetails =  CalculatingProduct.calculate(parameterMm, priceUnit, goodsTypeId, quantity, density);
+			   orderDetails.setGoodsTypeId(goodsTypeId);
+			   orderDetails.setMaterialId(materialInfoId);
+			   orderDetails.setParameterMm(parameterMm);
+			   orderDetails.setParameterInch(parameterInch);
+			   orderDetails.setProductProcessPrice(0.0);
+			   orderDetails.setProfitManagment(0.0);
+			   orderDetails.setTax(0.0);
+			   orderDetails.setInsideOutsideState(insideOutsideState);
+			   
+			   String partName = "Part1";
+			   if(!(request.getParameter("partName").trim() == null || "".equals(request.getParameter("partName").trim()))){
+				   partName = request.getParameter("partName");
+			   }
+			   
+			   orderDetails.setPartName(partName);
+			   orderDetails.setGoodsSet(quantity);
+
+			   clientOrder.setWeightUnit("ton");
+			   clientOrder.setSpaceUnit("m^3");
+			   clientOrder.setTotalPrice(orderDetails.getPrice() * orderDetails.getGoodsSet());
+			   clientOrder.setTotalSpace(orderDetails.getSpace() * orderDetails.getGoodsSet());
+			   clientOrder.setTotalWeight(orderDetails.getWeight() * orderDetails.getGoodsSet());
+			   clientOrder.setAmountUnit(a.getId());
+			 
+			   clientOrderService.insertClientOrder(clientOrder, orderDetails);
+			   
+			   request.setAttribute("orderDetails", orderDetails);
+			   
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+			return new JsonResult<Object>(e.getMessage()); 
+		}
+
+    	   return new JsonResult<Object>(orderDetails);
+       }
+    
+       /**
+        * 输入产品、材料、参数获取价格
+        * @param request
+        * @param response
+        * @return
+        */
+       @ResponseBody
+       @RequestMapping("/queryUnitPrice.do")
+       public JsonResult<Map<String,Double>> queryUnitPrice(HttpServletRequest request, HttpServletResponse response){
+    	   
+    	   Double price = 0.0;
+    	   Map<String,Double> map = new HashMap<String, Double>();
+		try {
+			  //根据国家获取汇率
+//			  AmountUnit amountUnit = amountUnitService.queryByCurrency("人民币");
+//			  Double exchangeRate = amountUnit.getExchangeRate();
+//			  String currencyShorthand = request.getParameter("USD");
+			  
+			String parameterMm = request.getParameter("parameterMm");
+			   String goodsType = request.getParameter("goodsType");
+			   Integer goodsTypeId = 0;
+			   if(!(goodsType == null || "".equals(goodsType))){
+				   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType); 
+				   goodsTypeId = goodsTypeInfo.getId();			   
+			   }
+			   Double density = 0.0;
+			   String materialType = request.getParameter("materialType");
+			   if(!(materialType == null || "".equals(materialType))){
+				   MaterialInfo materialInfo = materialInfoService.queryByType(materialType,goodsType);	
+				   density = materialInfo.getDensity();
+			
+			   }
+			   
+			   Integer set = 1;
+					   
+			   AmountUnit a = amountUnitService.queryByCurrencyShorthand("USD");
+			   Integer priceUnit = Integer.parseInt(calculateUnitPrice(materialType, goodsType, a.getExchangeRate()).get("price").toString());
+			   
+			   OrderDetails orderDetails =  CalculatingProduct.calculate(parameterMm, priceUnit, goodsTypeId, set, density);
+			   price = orderDetails.getPrice();
+			   
+			   map.put("price", price);
+			   map.put("weight", orderDetails.getWeight());
+			   map.put("surface", orderDetails.getSuperficialArea());
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			e.printStackTrace();
+		}
+		   
+    	   return new JsonResult<Map<String,Double>>(map);
+       }
+
+       
+	    /**
+	     * 跳转更新产品和工艺
+	     */
+		@RequestMapping("/toUpdateOrderDetails.do")
+		public String toUpdateOrderDetails(HttpServletRequest request, HttpServletResponse response){
+			try {
+				List<GoodsTypeInfo> goodsTypeInfos = goodsTypeInfoService.queryAll();
+				List<AmountUnit> amountUnits = amountUnitService.queryAll();
+				Integer orderDetailsId = null;
+				if(request.getParameter("orderDetailsId") == null || "".equals(request.getParameter("orderDetailsId"))){
+					throw new RuntimeException("orderDetailsId can not empty!");
+				}else{
+					orderDetailsId = Integer.parseInt(request.getParameter("orderDetailsId"));
+				}
+				OrderDetails orderDetails = orderDetailsService.queryById(orderDetailsId);
+				GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryById(orderDetails.getGoodsTypeId());
+				List<MaterialInfo> materialInfos = materialInfoService.queryByGoodsType(goodsTypeInfo.getGoodsType());
+				MaterialInfo materialInfo = materialInfoService.queryById(orderDetails.getMaterialId());
+			    AmountUnit a = amountUnitService.queryByCurrencyShorthand("USD");
+			    Integer price = Integer.parseInt(calculateUnitPrice(materialInfo.getMaterialType(), materialInfo.getGoodsType(), a.getExchangeRate()).get("price").toString());
+			    AmountUnit amountUnit = amountUnitService.queryByCurrencyShorthand("CNY");
+			    List<GoodsTypeNormal> goodsTypeNormals = goodsTypeNormalService.queryByGoodsTypeInfoId(GOODS_TYPE_ID);   
+				   
+			      /**
+			       * 显示工艺详情
+			       */
+				 List<ProcessDetails> processDetails = processDetailsService.queryByOrderDetailsId(orderDetailsId);	 
+				 List<List<ProcessInfo>> list2 = new ArrayList<List<ProcessInfo>>();
+				 List<ProcessInfo> list = new ArrayList<ProcessInfo>();
+				 List<ProcessInfo> processInfo = new ArrayList<ProcessInfo>();
+				 for (ProcessDetails processDetails2 : processDetails) {
+					 list = processInfoService.queryByLevel1(processDetails2.getLevel1Parameter());
+					 ProcessInfo p = processInfoService.queryById(processDetails2.getGoodsProcessId());
+					 list2.add(list);
+					 processInfo.add(p);
+				}
+				List<ProcessInfo> processInfos = processInfoService.queryAll();
+			
+				
+			 request.setAttribute("goodsType", goodsTypeInfo.getGoodsType());
+			 request.setAttribute("materialType", materialInfo.getMaterialType());	     
+			 request.setAttribute("list2", list2);
+			 request.setAttribute("processInfos", processInfos);
+			 request.setAttribute("orderDetails", orderDetails);
+			 request.setAttribute("processDetails", processDetails);
+			 request.setAttribute("processInfo", processInfo);   
+			   
+			 
+			request.setAttribute("goodsTypeNormals", goodsTypeNormals);
+			request.setAttribute("price", price);
+			request.setAttribute("goodsTypeInfo", goodsTypeInfo);
+			request.setAttribute("goodsTypeInfos", goodsTypeInfos);
+			request.setAttribute("materialInfos", materialInfos);
+			request.setAttribute("materialInfo", materialInfo);
+			request.setAttribute("amountUnits", amountUnits);
+			request.setAttribute("amountUnit", amountUnit);
+			} catch (NumberFormatException e) {
+				logger.error(e.getMessage(), e);
+				e.printStackTrace();
+			}
+
+			
+		   return "calculator2_review.jsp";    	
+		}
+		
+		/**
+		 * 更新单个产品数据
+		 * @param request
+		 * @param response
+		 * @return
+		 */
+		@ResponseBody
+		@RequestMapping("/updateOrderDetails.do")
+		public JsonResult<String> updateOrderDetails(HttpServletRequest request, HttpServletResponse response){
+		  	try {
+				Integer orderDetailsId = null;
+				if(request.getParameter("orderDetailsId") == null || "".equals(request.getParameter("orderDetailsId"))){
+					throw new RuntimeException("orderDetailsId can not empty!");
+				}else{
+					orderDetailsId = Integer.parseInt(request.getParameter("orderDetailsId"));
+				}
+				OrderDetails orderDetails = orderDetailsService.queryById(orderDetailsId);
+				String goodsType = request.getParameter("goodsType");
+				   Integer goodsTypeId = 0;
+				   Integer insideOutsideState = 0;
+				   if(!(goodsType == null || "".equals(goodsType))){
+					   GoodsTypeInfo goodsTypeInfo = goodsTypeInfoService.queryByGoodsType(goodsType); 
+					   goodsTypeId = goodsTypeInfo.getId();	
+					   insideOutsideState = goodsTypeInfo.getInsideOutsideState();
+				   }
+				   
+				   String parameterMm = request.getParameter("parameterMm");
+				   String parameterInch = request.getParameter("parameterInch");
+				   
+				   Double density = 0.0;
+				   String materialType = request.getParameter("materialType");
+				   Integer materialInfoId = 0;
+				   if(!(materialType == null || "".equals(materialType))){
+					   MaterialInfo materialInfo = materialInfoService.queryByType(materialType,goodsType);	
+					   materialInfoId = materialInfo.getId();
+					   density = materialInfo.getDensity();
+				   }
+				   Integer quantity = 1; 
+				   if(!(request.getParameter("quantity") == null || "".equals(request.getParameter("quantity")))){
+					   quantity = Integer.parseInt(request.getParameter("quantity"));
+				   }	
+				   AmountUnit a = amountUnitService.queryByCurrencyShorthand("USD");
+				   Integer priceUnit = Integer.parseInt(calculateUnitPrice(materialType, goodsType, a.getExchangeRate()).get("price").toString());
+				   
+				   OrderDetails o = CalculatingProduct.calculate(parameterMm, priceUnit, goodsTypeId, quantity, density);
+				   orderDetails.setGoodsTypeId(goodsTypeId);
+				   orderDetails.setMaterialId(materialInfoId);
+				   orderDetails.setParameterMm(parameterMm);
+				   orderDetails.setParameterInch(parameterInch);
+				   String partName = "";
+				   if(!(request.getParameter("partName").trim() == null || "".equals(request.getParameter("partName").trim()))){
+					   partName = request.getParameter("partName");
+				   }
+				   
+				   orderDetails.setInsideOutsideState(insideOutsideState);
+				   orderDetails.setPartName(partName);
+				   orderDetails.setGoodsSet(quantity);
+				   orderDetails.setPrice(o.getPrice());
+				   orderDetails.setProductSize(o.getProductSize());
+				   orderDetails.setSuperficialArea(o.getSuperficialArea());
+				   List<ProcessDetails> ProcessDetails = processDetailsService.queryByOrderDetailsId(orderDetailsId);
+				   if(ProcessDetails.size() != 0){
+					   orderDetails.setUnitPrice(o.getUnitPrice() + orderDetails.getProductProcessPrice());   
+				   }else{
+					   orderDetails.setUnitPrice(o.getUnitPrice());
+				   }				   
+				   orderDetails.setWeight(o.getWeight());
+				   orderDetails.setSpace(o.getSpace());
+				   
+				   orderDetailsService.updateOrderDetails(orderDetails);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				e.printStackTrace();
+				return new JsonResult<String>(1,e.getMessage());
+			}
+		  	
+		  	
+			return new JsonResult<String>(0,"yes");
+		} 
+
+		
+		/**
+		 * 根据产品id删除
+		 * @param request
+		 * @param response
+		 * @return
+		 */
+		@ResponseBody
+		@RequestMapping("/deleteOrderDetailsById.do")
+		public JsonResult<String> deleteOrderDetailsById(HttpServletRequest request, HttpServletResponse response){
+			try {
+				Integer orderDetailsId = null;
+				if(request.getParameter("orderDetailsId") == null || "".equals(request.getParameter("orderDetailsId"))){
+					throw new RuntimeException("orderDetailsId can not empty!");
+				}else{
+					orderDetailsId = Integer.parseInt(request.getParameter("orderDetailsId"));
+				}
+				orderDetailsService.deleteById(orderDetailsId);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+				e.printStackTrace();
+				return new JsonResult<String>(1,e.getMessage());
+			}
+			
+			return new JsonResult<String>(0,"Delete successfully");
+		}
+		
+		
+		
+		
+		
+	
+	/**
+	 * 将物品、材料转化为美元计算
+	 */
+   public Map<Object,Object> calculateUnitPrice(String materialType,String goodsType,Double rate){
+	   
+	   Map<Object, Object> map = new HashMap<Object, Object>();
+	try {
+		MaterialInfo materialInfo = materialInfoService.queryByType(materialType,goodsType);	
+		   String updateDate = null;
+		   if(!(materialInfo.getUpdateDate() == null || "".equals(materialInfo.getUpdateDate()))){
+			   updateDate = DateFormat.formatDate3(materialInfo.getUpdateDate());
+		   }
+		   AmountUnit a = amountUnitService.queryByCurrency("人民币");
+		   Double unitPrice = 0.0;
+		   if(materialInfo.getUnitPrice() != null && !"".equals(materialInfo.getUnitPrice())){		                
+		    unitPrice = new BigDecimal(materialInfo.getUnitPrice()).divide(new BigDecimal(a.getExchangeRate()),0,RoundingMode.UP).multiply(new BigDecimal(1.03)).doubleValue();    
+		   }
+		   Integer price = 0;
+		   BigDecimal b1 = new BigDecimal(unitPrice);  			                
+		   price = b1.multiply( new BigDecimal(rate)).setScale(0, BigDecimal.ROUND_UP).intValue();   
+		   map.put("updateDate", updateDate);
+		   map.put("price",price);
+		   
+	} catch (ParseException e) {
+		e.printStackTrace();
+	}
+	   
+	   return map;
+}
+       
+}

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.KuaiYunMapper" >
+  <resultMap id="BaseResultMap" type="com.yf.bean.KuaiYun" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="country" property="country" jdbcType="VARCHAR" />
+    <result column="zone" property="zone" jdbcType="INTEGER" />
+    <result column="epacket" property="epacket" jdbcType="VARCHAR" />
+    <result column="chinapostbig" property="chinapostbig" jdbcType="VARCHAR" />
+    <result column="dhlfba" property="dhlfba" jdbcType="VARCHAR" />
+    <result column="fedexie" property="fedexie" jdbcType="VARCHAR" />
+    <result column="sweden" property="sweden" jdbcType="VARCHAR" />
+    <result column="tnt" property="tnt" jdbcType="INTEGER" />
+    <result column="kyd" property="kyd" jdbcType="INTEGER" />
+    <result column="ems" property="ems" jdbcType="INTEGER" />
+    <result column="efast" property="efast" jdbcType="INTEGER" />
+    <result column="fedexground" property="fedexground" jdbcType="VARCHAR" />
+    <result column="ltlshipping" property="ltlshipping" jdbcType="VARCHAR" />
+    <result column="portpickup" property="portpickup" jdbcType="INTEGER" />
+    <result column="airportpickup" property="airportpickup" jdbcType="INTEGER" />
+    <result column="aramexmideast" property="aramexmideast" jdbcType="INTEGER" />
+    <result column="dhl" property="dhl" jdbcType="INTEGER" />
+    <result column="dhlfbaother" property="dhlfbaother" jdbcType="INTEGER" />
+    <result column="area" property="area" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, country, zone, epacket, chinapostbig, dhlfba, fedexie, sweden, tnt, kyd, ems, 
+    efast, fedexground, ltlshipping, portpickup, airportpickup, aramexmideast, dhl, dhlfbaother, 
+    area
+  </sql>
+<!--   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" > -->
+<!--     select  -->
+<!--     <include refid="Base_Column_List" /> -->
+<!--     from yf_zone -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </select> -->
+<!--   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" > -->
+<!--     delete from yf_zone -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </delete> -->
+<!--   <insert id="insert" parameterType="com.yf.model.KuaiYun" > -->
+<!--     insert into yf_zone (id, country, zone,  -->
+<!--       epacket, chinapostbig, dhlfba,  -->
+<!--       fedexie, sweden, tnt,  -->
+<!--       kyd, ems, efast, fedexground,  -->
+<!--       ltlshipping, portpickup, airportpickup,  -->
+<!--       aramexmideast, dhl, dhlfbaother,  -->
+<!--       area) -->
+<!--     values (#{id,jdbcType=INTEGER}, #{country,jdbcType=VARCHAR}, #{zone,jdbcType=INTEGER},  -->
+<!--       #{epacket,jdbcType=VARCHAR}, #{chinapostbig,jdbcType=VARCHAR}, #{dhlfba,jdbcType=VARCHAR},  -->
+<!--       #{fedexie,jdbcType=VARCHAR}, #{sweden,jdbcType=VARCHAR}, #{tnt,jdbcType=INTEGER},  -->
+<!--       #{kyd,jdbcType=INTEGER}, #{ems,jdbcType=INTEGER}, #{efast,jdbcType=INTEGER}, #{fedexground,jdbcType=VARCHAR},  -->
+<!--       #{ltlshipping,jdbcType=VARCHAR}, #{portpickup,jdbcType=INTEGER}, #{airportpickup,jdbcType=INTEGER},  -->
+<!--       #{aramexmideast,jdbcType=INTEGER}, #{dhl,jdbcType=INTEGER}, #{dhlfbaother,jdbcType=INTEGER},  -->
+<!--       #{area,jdbcType=VARCHAR}) -->
+<!--   </insert> -->
+<!--   <insert id="insertSelective" parameterType="com.yf.model.KuaiYun" > -->
+<!--     insert into yf_zone -->
+<!--     <trim prefix="(" suffix=")" suffixOverrides="," > -->
+<!--       <if test="id != null" > -->
+<!--         id, -->
+<!--       </if> -->
+<!--       <if test="country != null" > -->
+<!--         country, -->
+<!--       </if> -->
+<!--       <if test="zone != null" > -->
+<!--         zone, -->
+<!--       </if> -->
+<!--       <if test="epacket != null" > -->
+<!--         epacket, -->
+<!--       </if> -->
+<!--       <if test="chinapostbig != null" > -->
+<!--         chinapostbig, -->
+<!--       </if> -->
+<!--       <if test="dhlfba != null" > -->
+<!--         dhlfba, -->
+<!--       </if> -->
+<!--       <if test="fedexie != null" > -->
+<!--         fedexie, -->
+<!--       </if> -->
+<!--       <if test="sweden != null" > -->
+<!--         sweden, -->
+<!--       </if> -->
+<!--       <if test="tnt != null" > -->
+<!--         tnt, -->
+<!--       </if> -->
+<!--       <if test="kyd != null" > -->
+<!--         kyd, -->
+<!--       </if> -->
+<!--       <if test="ems != null" > -->
+<!--         ems, -->
+<!--       </if> -->
+<!--       <if test="efast != null" > -->
+<!--         efast, -->
+<!--       </if> -->
+<!--       <if test="fedexground != null" > -->
+<!--         fedexground, -->
+<!--       </if> -->
+<!--       <if test="ltlshipping != null" > -->
+<!--         ltlshipping, -->
+<!--       </if> -->
+<!--       <if test="portpickup != null" > -->
+<!--         portpickup, -->
+<!--       </if> -->
+<!--       <if test="airportpickup != null" > -->
+<!--         airportpickup, -->
+<!--       </if> -->
+<!--       <if test="aramexmideast != null" > -->
+<!--         aramexmideast, -->
+<!--       </if> -->
+<!--       <if test="dhl != null" > -->
+<!--         dhl, -->
+<!--       </if> -->
+<!--       <if test="dhlfbaother != null" > -->
+<!--         dhlfbaother, -->
+<!--       </if> -->
+<!--       <if test="area != null" > -->
+<!--         area, -->
+<!--       </if> -->
+<!--     </trim> -->
+<!--     <trim prefix="values (" suffix=")" suffixOverrides="," > -->
+<!--       <if test="id != null" > -->
+<!--         #{id,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="country != null" > -->
+<!--         #{country,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="zone != null" > -->
+<!--         #{zone,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="epacket != null" > -->
+<!--         #{epacket,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="chinapostbig != null" > -->
+<!--         #{chinapostbig,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="dhlfba != null" > -->
+<!--         #{dhlfba,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="fedexie != null" > -->
+<!--         #{fedexie,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="sweden != null" > -->
+<!--         #{sweden,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="tnt != null" > -->
+<!--         #{tnt,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="kyd != null" > -->
+<!--         #{kyd,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="ems != null" > -->
+<!--         #{ems,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="efast != null" > -->
+<!--         #{efast,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="fedexground != null" > -->
+<!--         #{fedexground,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="ltlshipping != null" > -->
+<!--         #{ltlshipping,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="portpickup != null" > -->
+<!--         #{portpickup,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="airportpickup != null" > -->
+<!--         #{airportpickup,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="aramexmideast != null" > -->
+<!--         #{aramexmideast,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="dhl != null" > -->
+<!--         #{dhl,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="dhlfbaother != null" > -->
+<!--         #{dhlfbaother,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="area != null" > -->
+<!--         #{area,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--     </trim> -->
+<!--   </insert> -->
+<!--   <update id="updateByPrimaryKeySelective" parameterType="com.yf.model.KuaiYun" > -->
+<!--     update yf_zone -->
+<!--     <set > -->
+<!--       <if test="country != null" > -->
+<!--         country = #{country,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="zone != null" > -->
+<!--         zone = #{zone,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="epacket != null" > -->
+<!--         epacket = #{epacket,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="chinapostbig != null" > -->
+<!--         chinapostbig = #{chinapostbig,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="dhlfba != null" > -->
+<!--         dhlfba = #{dhlfba,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="fedexie != null" > -->
+<!--         fedexie = #{fedexie,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="sweden != null" > -->
+<!--         sweden = #{sweden,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="tnt != null" > -->
+<!--         tnt = #{tnt,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="kyd != null" > -->
+<!--         kyd = #{kyd,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="ems != null" > -->
+<!--         ems = #{ems,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="efast != null" > -->
+<!--         efast = #{efast,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="fedexground != null" > -->
+<!--         fedexground = #{fedexground,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="ltlshipping != null" > -->
+<!--         ltlshipping = #{ltlshipping,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="portpickup != null" > -->
+<!--         portpickup = #{portpickup,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="airportpickup != null" > -->
+<!--         airportpickup = #{airportpickup,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="aramexmideast != null" > -->
+<!--         aramexmideast = #{aramexmideast,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="dhl != null" > -->
+<!--         dhl = #{dhl,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="dhlfbaother != null" > -->
+<!--         dhlfbaother = #{dhlfbaother,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="area != null" > -->
+<!--         area = #{area,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--     </set> -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </update> -->
+<!--   <update id="updateByPrimaryKey" parameterType="com.yf.model.KuaiYun" > -->
+<!--     update yf_zone -->
+<!--     set country = #{country,jdbcType=VARCHAR}, -->
+<!--       zone = #{zone,jdbcType=INTEGER}, -->
+<!--       epacket = #{epacket,jdbcType=VARCHAR}, -->
+<!--       chinapostbig = #{chinapostbig,jdbcType=VARCHAR}, -->
+<!--       dhlfba = #{dhlfba,jdbcType=VARCHAR}, -->
+<!--       fedexie = #{fedexie,jdbcType=VARCHAR}, -->
+<!--       sweden = #{sweden,jdbcType=VARCHAR}, -->
+<!--       tnt = #{tnt,jdbcType=INTEGER}, -->
+<!--       kyd = #{kyd,jdbcType=INTEGER}, -->
+<!--       ems = #{ems,jdbcType=INTEGER}, -->
+<!--       efast = #{efast,jdbcType=INTEGER}, -->
+<!--       fedexground = #{fedexground,jdbcType=VARCHAR}, -->
+<!--       ltlshipping = #{ltlshipping,jdbcType=VARCHAR}, -->
+<!--       portpickup = #{portpickup,jdbcType=INTEGER}, -->
+<!--       airportpickup = #{airportpickup,jdbcType=INTEGER}, -->
+<!--       aramexmideast = #{aramexmideast,jdbcType=INTEGER}, -->
+<!--       dhl = #{dhl,jdbcType=INTEGER}, -->
+<!--       dhlfbaother = #{dhlfbaother,jdbcType=INTEGER}, -->
+<!--       area = #{area,jdbcType=VARCHAR} -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </update> -->
+<select id="ajaxKuaiYunName" resultMap="BaseResultMap">
+select 
+<include refid="Base_Column_List" />
+from yf_zone where 1=1 and (
+		country like CONCAT(#{doctor_name},'%') 
+		or chinapostbig like CONCAT(#{doctor_name},'%'))
+		order by country
+</select>
+</mapper>

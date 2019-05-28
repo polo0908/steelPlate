@@ -1,0 +1,103 @@
+// 工艺名
+var process_arr = new Array("Plate shearing", "Bar cut off", "Punching/ Stamping","Cutting edge","CNC turret punch", 
+		"Laser cutting", "Water jet cutting", "Plasma cutting","Flame cutting", "CNC machining","Lathe machining",
+		"Plate bending","Pipe bending",
+		"Welding-TIG","Welding-MIG","Welding-robotic welding","Assembly(manual)","Polishing machine","Deep drawing machine",
+		"Annealing","---Surface Treatment---", 
+		"Mirror polishing","Anodizing","Powder coating","Electro plating(Chrome)","Spray painting",
+		"Hot dip galvanizing","Cold galvanizing","Electrophoretic painting","Brushing");
+ 
+// 工艺处理过程
+var s_a = new Array();
+
+//level2&level3&superficial_state&level2_explain
+
+s_a[0] = "&times&0&&/steelPlate/calculator/images/001blanking.jpg";
+s_a[1] = "&times&0&&/steelPlate/calculator/images/002barcutoff.jpg";
+s_a[2] = "small|middle|large&times&0&Machine Tonnage&/steelPlate/calculator/images/003punching.jpg";
+s_a[3] = "160T|200T&times&0&Machine Tonnage&/steelPlate/calculator/images/003punching.jpg";
+s_a[4] = "&hrs&0&&/steelPlate/calculator/images/006turretpunching.jpg";
+s_a[5] = "<5mm|5-10mm|10-20mm&mm&0&Thickness&/steelPlate/calculator/images/005lasercutting.jpg";
+s_a[6] = "<5mm|5-10mm|10-20mm&mm&0&Thickness&/steelPlate/calculator/images/012waterjetcutting.jpg";
+
+s_a[7] = "&mm&0&Length&/steelPlate/calculator/images/009plasmacutting.jpg";
+s_a[8] = "&mm&0&Length&/steelPlate/calculator/images/010flamecutting.jpg";
+s_a[9] = "3 AXIS|4 AXIS|5 AXIS&hrs&0&&/steelPlate/calculator/images/008cnc.jpg";
+s_a[10] = "&hrs&0&&/steelPlate/calculator/images/004lathemachining.jpg";
+s_a[11] = "63T|100T&times&0&Machine Tonnage&/steelPlate/calculator/images/011bending.jpg";
+s_a[12] = "φ20*2|φ38*2|φ50*2|φ60*2|φ80*2&times&0&Outer Dia.*Thk&/steelPlate/calculator/images/028pipebend.jpg";
+
+s_a[13] = "&mm&0&Length&/steelPlate/calculator/images/013weldingtig.jpg";
+s_a[14] = "&mm&0&Length&/steelPlate/calculator/images/014weldingmig.jpg";
+s_a[15] = "&mm&0&Length&/steelPlate/calculator/images/015weldingrobotic.jpg";
+s_a[16] = "&hrs&0&&/steelPlate/calculator/images/007assembly.jpg";
+s_a[17] = "&hrs&0&&/steelPlate/calculator/images/mirrorpolishing.jpg";
+s_a[18] = "250T|400T|600T|800T|1000T&times&0&Machine Tonnage&/steelPlate/calculator/images/electrophoreticpainting.jpg";
+
+s_a[19] = "&hrs&0&&/steelPlate/calculator/images/electrophoreticpainting.jpg";
+s_a[20] = "&&&&";
+s_a[21] = "&m^2&1&Surface Area&/steelPlate/calculator/images/mirrorpolishing.jpg";
+s_a[22] = "&m^2&1&Surface Area&/steelPlate/calculator/images/021anodizing.jpg";
+s_a[23] = "&m^2&1&Surface Area&/steelPlate/calculator/images/022powdercoating.jpg";
+s_a[24] = "&m^2&1&Surface Area&/steelPlate/calculator/images/024electroplating.jpg";
+s_a[25] = "&m^2&1&Surface Area&/steelPlate/calculator/images/023painting.jpg";
+s_a[26] = "&m^2&1&Surface Area&/steelPlate/calculator/images/026hotdipgalvanizing.jpg";
+s_a[27] = "&m^2&1&Surface Area&/steelPlate/calculator/images/027coldgalvanizing.jpg";
+s_a[28] = "&m^2&1&Surface Area&/steelPlate/calculator/images/electrophoreticpainting.jpg";
+s_a[29] = "&m^2&1&Surface Area&/steelPlate/calculator/images/electrophoreticpainting.jpg";
+
+
+
+ 
+function getLevel2(index) {
+
+//    var selectedIndex = $(obj).find('option:selected').selectedIndex;    
+    var state_arr = s_a[index].split("&");
+    if(state_arr[0] != '' && state_arr[0] != undefined){
+    	return state_arr[0].split("|");
+    }else{
+    	return '';
+    }
+}
+function getLevel3(index) {
+	
+//	var selectedIndex = $(obj).find('option:selected').selectedIndex;    
+	var state_arr = s_a[index].split("&");
+	if(state_arr[1] != '' && state_arr[1] != undefined){
+		return state_arr[1];
+	}else{
+		return '';
+	}
+}
+function getSuperficialState(index) {
+	
+//	var selectedIndex = $(obj).find('option:selected').selectedIndex;    
+	var state_arr = s_a[index].split("&");
+	if(state_arr[2] != '' && state_arr[2] != undefined){
+		return state_arr[2];
+	}else{
+		return '';
+	}
+}
+function getLevel2Explain(index) {
+	
+//	var selectedIndex = $(obj).find('option:selected').selectedIndex;    
+	var state_arr = s_a[index].split("&");
+	if(state_arr[3] != '' && state_arr[3] != undefined){
+		return state_arr[3];
+	}else{
+		return '';
+	}
+}
+function getProcessImg(index) {
+	
+//	var selectedIndex = $(obj).find('option:selected').selectedIndex;    
+	var state_arr = s_a[index].split("&");
+	if(state_arr[4] != '' && state_arr[4] != undefined){
+		return state_arr[4];
+	}else{
+		return '';
+	}
+}
+ 
+

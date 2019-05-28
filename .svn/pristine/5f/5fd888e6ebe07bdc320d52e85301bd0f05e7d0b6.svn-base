@@ -1,0 +1,88 @@
+package com.cal.bean;
+
+import java.io.Serializable;
+
+public class MaterialInfo implements Serializable {
+	  
+	  private Integer id;
+	  private String goodsType;  //物品种类
+	  private String materialType;  //材质
+	  private Double density; //密度
+	  private String densityUnit;   //密度单位
+      private Integer unitPrice;    //材料单价
+	  private String din;           //材质德标
+	  private String astm;          //材质美标
+	  private String updateDate;    //价格更新时间
+      
+      
+	public String getUpdateDate() {
+		return updateDate;
+	}
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
+	}
+	public String getDin() {
+		return din;
+	}
+	public void setDin(String din) {
+		this.din = din;
+	}
+	public String getAstm() {
+		return astm;
+	}
+	public void setAstm(String astm) {
+		this.astm = astm;
+	}
+	public void setGoodsType(String goodsType) {
+		this.goodsType = goodsType;
+	}
+	public Integer getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(Integer unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	public String getGoodsType() {
+		return goodsType;
+	}
+	public void setGoodsTypeId(String goodsType) {
+		this.goodsType = goodsType;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getMaterialType() {
+		return materialType;
+	}
+	public void setMaterialType(String materialType) {
+		this.materialType = materialType;
+	}
+	public Double getDensity() {
+		return density;
+	}
+	public void setDensity(Double density) {
+		this.density = density;
+	}
+	public String getDensityUnit() {
+		return densityUnit;
+	}
+	public void setDensityUnit(String densityUnit) {
+		this.densityUnit = densityUnit;
+	}
+	@Override
+	public String toString() {
+		return "MaterialInfo [id=" + id + ", goodsType=" + goodsType
+				+ ", materialType=" + materialType + ", density=" + density
+				+ ", densityUnit=" + densityUnit + ", unitPrice=" + unitPrice
+				+ ", din=" + din + ", astm=" + astm + ", updateDate="
+				+ updateDate + "]";
+	}
+	  
+	  
+	
+	
+
+}

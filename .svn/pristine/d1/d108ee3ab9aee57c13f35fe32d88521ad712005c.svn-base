@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.ZhengGuiMapper">
+	<resultMap id="BaseResultMap" type="com.yf.bean.ZhengGui">
+		<id column="itemId" property="itemid" jdbcType="INTEGER" />
+		<result column="youXiaoQi" property="youxiaoqi" jdbcType="DATE" />
+		<result column="huoDaiCompany" property="huodaicompany"
+			jdbcType="VARCHAR" />
+		<result column="chuanCompany" property="chuancompany" jdbcType="VARCHAR" />
+		<result column="qiDianPort" property="qidianport" jdbcType="VARCHAR" />
+		<result column="zhongDianPort" property="zhongdianport"
+			jdbcType="VARCHAR" />
+		<result column="qiDianRegion" property="qiDianRegion" jdbcType="VARCHAR" />
+		<result column="zhongDianRegion" property="zhongDianRegion"
+			jdbcType="VARCHAR" />
+		<result column="GP20" property="gp20" jdbcType="VARCHAR" />
+		<result column="GP40" property="gp40" jdbcType="VARCHAR" />
+		<result column="HQ40" property="hq40" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		itemId, youXiaoQi, huoDaiCompany, chuanCompany, qiDianPort,
+		zhongDianPort,qiDianRegion,zhongDianRegion,GP20,GP40, HQ40
+	</sql>
+	<!-- 分页 -->
+	<select id="getAll" resultMap="BaseResultMap" parameterType="com.yf.bean.QueryPortInfo">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		order by itemId limit #{pageNo,jdbcType=INTEGER},6
+	</select>
+	<!-- 动态分页 -->
+	<select id="findListByDynamicCount" parameterType="com.yf.bean.QueryPortInfo"
+		resultType="Long">
+		select count(itemId) totalNumber
+		from yf_zhengguitable where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+	</select>
+
+	<select id="getHotPortRepeatList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		group by
+		chuanCompany
+		having count(*)
+		> 1;
+	</select>
+
+	<select id="getHotPortNoRepeatList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		group by
+		chuanCompany
+		having count(*)
+		= 1;
+	</select>
+
+	<select id="getMatchHotList" resultMap="BaseResultMap"
+		parameterType="com.yf.bean.ZhengGui">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		and chuanCompany =
+		#{chuancompany,jdbcType=VARCHAR}
+		and qiDianPort =
+		#{qidianport,jdbcType=VARCHAR}
+		and zhongDianPort =
+		#{zhongdianport,jdbcType=VARCHAR};
+	</select>
+
+	<select id="getHasRepeatList" resultMap="BaseResultMap"
+		parameterType="com.yf.bean.QueryPortInfo">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable
+		where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		group by
+		chuanCompany
+		having count(*) > 1
+
+		union
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		group by
+		chuanCompany
+		having count(*) > 1
+		order by qiDianPort DESC;
+
+	</select>
+
+	<select id="getNoRepeatList" resultMap="BaseResultMap"
+		parameterType="com.yf.bean.QueryPortInfo">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable
+		where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		group by
+		chuanCompany
+		having count(*) = 1
+
+		union
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		group by
+		chuanCompany
+		having count(*) = 1
+		order by qiDianPort DESC;
+
+	</select>
+
+	<select id="getMatchList" resultMap="BaseResultMap"
+		parameterType="com.yf.bean.ZhengGui">
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable
+		where 1=1
+		and chuanCompany =
+		#{chuancompany,jdbcType=VARCHAR}
+		and qiDianPort =
+		#{qidianport,jdbcType=VARCHAR}
+		and zhongDianPort =
+		#{zhongdianport,jdbcType=VARCHAR}
+
+		union
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_zhengguitable_hot
+		where 1=1
+		and chuanCompany =
+		#{chuancompany,jdbcType=VARCHAR}
+		and qiDianPort =
+		#{qidianport,jdbcType=VARCHAR}
+		and zhongDianPort =
+		#{zhongdianport,jdbcType=VARCHAR};
+
+	</select>
+    
+    <!-- 根据目的地查询GP20价格大于800USD的平均价 -->
+    <select id="calculateGP20AveragePrice" resultType="Double" parameterType="string">
+		 select avg(p1.GP20) from  
+                  (
+                  select <include refid="Base_Column_List" /> from
+                      (
+			            (
+					    select  <include refid="Base_Column_List" /> from yf_zhengguitable
+					    )
+					     UNION
+					    (
+					    select <include refid="Base_Column_List" /> from yf_zhengguitable_hot
+					    )
+					   )z1 
+		           )p1
+		       where p1.zhongDianRegion = #{zhongDianRegion,jdbcType=VARCHAR} and LENGTH(0+p1.GP20)=LENGTH(p1.GP20) and p1.GP20 &gt;800     
+    </select>
+    
+    <!-- 根据目的地查询GP40价格大于800USD的平均价 -->
+      <select id="calculateGP40AveragePrice" resultType="Double" parameterType="string">
+		 select avg(p1.GP40) from  
+                  (
+                  select <include refid="Base_Column_List" /> from
+                      (
+			            (
+					    select  <include refid="Base_Column_List" /> from yf_zhengguitable
+					    )
+					     UNION
+					    (
+					    select <include refid="Base_Column_List" /> from yf_zhengguitable_hot
+					    )
+					   )z1 
+		           )p1
+		       where p1.zhongDianRegion = #{zhongDianRegion,jdbcType=VARCHAR} and LENGTH(0+p1.GP40)=LENGTH(p1.GP40) and p1.GP40 &gt;800     
+    </select>
+    
+    <!-- 根据目的地查询HQ40价格大于800USD的平均价 -->
+    <select id="calculateHQ40AveragePrice" resultType="Double" parameterType="string">
+		 select avg(p1.HQ40) from  
+                  (
+                  select <include refid="Base_Column_List" /> from
+                      (
+			            (
+					    select  <include refid="Base_Column_List" /> from yf_zhengguitable
+					    )
+					     UNION
+					    (
+					    select <include refid="Base_Column_List" /> from yf_zhengguitable_hot
+					    )
+					   )z1 
+		           )p1
+		       where p1.zhongDianRegion = #{zhongDianRegion,jdbcType=VARCHAR} and LENGTH(0+p1.HQ40)=LENGTH(p1.HQ40) and p1.HQ40 &gt;800     
+    </select>
+
+</mapper>

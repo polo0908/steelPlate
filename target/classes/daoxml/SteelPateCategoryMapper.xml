@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.mapper.SteelPateCategoryMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.model.SteelPateCategory">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="pid" property="pid" jdbcType="INTEGER" />
+		<result column="clv" property="clv" jdbcType="INTEGER" />
+		<result column="path" property="path" jdbcType="VARCHAR" />
+		<result column="category" property="category" jdbcType="VARCHAR" />
+		<result column="state" property="state" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, pid, clv, path, category, state
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from steel_pate_category
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from steel_pate_category
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.cbt.model.SteelPateCategory">
+		insert into steel_pate_category (id, pid, clv,
+		path, category, state
+		)
+		values (#{id,jdbcType=INTEGER}, #{pid,jdbcType=INTEGER},
+		#{clv,jdbcType=INTEGER},
+		#{path,jdbcType=VARCHAR}, #{category,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER}
+		)
+	</insert>
+	
+
+<!-- 	<update id="updateByExampleSelective" parameterType="map"> -->
+<!-- 		update steel_pate_category -->
+<!-- 		<set> -->
+<!-- 			<if test="record.id != null"> -->
+<!-- 				id = #{record.id,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.pid != null"> -->
+<!-- 				pid = #{record.pid,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.clv != null"> -->
+<!-- 				clv = #{record.clv,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.path != null"> -->
+<!-- 				path = #{record.path,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.category != null"> -->
+<!-- 				category = #{record.category,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.state != null"> -->
+<!-- 				state = #{record.state,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 		</set> -->
+<!-- 		<if test="_parameter != null"> -->
+<!-- 			<include refid="Update_By_Example_Where_Clause" /> -->
+<!-- 		</if> -->
+<!-- 	</update> -->
+
+</mapper>

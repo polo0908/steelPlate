@@ -1,0 +1,141 @@
+package com.cal.quartz;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimerTask;
+
+import org.apache.log4j.Logger;
+
+import com.cal.util.db.DbPoolUtil;
+import com.cbt.util.SerializeUtil;
+
+import net.sf.json.JSONObject;
+
+public class MyTimerTask extends TimerTask{
+    
+	
+	public static Logger LOG = Logger.getLogger(TimerTask.class);
+	
+	@Override
+	public void run(){
+	 System.out.println("=========汇率更新运行=========");
+     	   //base  源币种
+     	   //tcur  目标币种
+	    	URL u = null;
+			try {
+				//u = new URL("http://api.k780.com:88/?app=finance.rate&scur=USD&tcur="+str+"&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json");
+				u = new URL("http://api.fixer.io/latest?base=USD");
+			
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+	        InputStream in = null;
+			try {
+//				in = u.openStream();
+				URLConnection conn = u.openConnection();
+				in = conn.getInputStream();// 获取数据流
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	        ByteArrayOutputStream out=new ByteArrayOutputStream();
+	        try {
+	            byte buf[]=new byte[1024];
+	            int read = 0;
+	            try {
+					while ((read = in.read(buf)) > 0) {
+					    out.write(buf, 0, read);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+	        }  finally {
+	            if (in != null) {
+	                try {
+						in.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+	            }
+	        }
+	        byte b[]=out.toByteArray( );
+	        JSONObject json = null;
+			try {
+				json = JSONObject.fromObject(new String(b,"utf-8"));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+	        Object obj = json.get("rates");
+	        Map<Object, Object> map = SerializeUtil.JsonToMap(obj.toString());
+//	        System.out.println("源币种--"+json.get("base")+"--目标币种--"+map.get("rates")+"--rate---"+subJson.get("rate"));
+	        System.out.println(obj);	
+ 			if(!(map == null || map.size() == 0)){
+				 Set<Object> keySet = map.keySet();
+				   for (Object key : keySet) {	
+					   if("CNY".equals(key) || "EUR".equals(key) || "GBP".equals(key)){
+						    Double rate = Double.parseDouble(map.get(key).toString());  
+							updateRate(key.toString(),rate); 
+					   }
+				   }
+ 			}	   
+         System.out.println("=========汇率更新结束=========");
+	}    
+     
+     
+   //更新已有数据。
+ 	public static void updateRate(String currencyShorthand,Double rate){
+ 		
+
+ 		
+ 		Connection conn = DbPoolUtil.getConnection();
+ 		String updateSql = "update amount_unit"
+ 				+ " set exchange_rate= ?,update_date=now()"  
+ 				+ " where currency_shorthand = ?";
+ 		try{
+ 			PreparedStatement psmt = conn.prepareStatement(updateSql);
+ 			
+ 			psmt.setDouble(1, rate);
+ 			psmt.setString(2, currencyShorthand);
+ 			
+ 			psmt.execute();
+
+ 		} catch (SQLException e) {
+ 			e.printStackTrace();
+ 			LOG.error("<<<<<<<<<<<<<<<<<<MyTimerTask>>>>>>>>>>>>>>>>>>>更新汇率失败"+e.getMessage());
+ 		}	finally {
+ 			DbPoolUtil.returnConnection(conn);
+ 		}
+ 	} 
+	 
+ 	
+	public void updatePrice(){
+		Connection conn = DbPoolUtil.getConnection();
+ 		String updateSql = "update material_info"
+ 				+ " set update_date=now()" ;
+ 		try{
+ 			PreparedStatement psmt = conn.prepareStatement(updateSql);						
+ 			psmt.execute();
+
+ 		} catch (SQLException e) {
+ 			e.printStackTrace();
+ 			LOG.error("<<<<<<<<<<<<<<<<<<MyTimerTask>>>>>>>>>>>>>>>>>>>更新失败"+e.getMessage());
+ 		}	finally {
+ 			DbPoolUtil.returnConnection(conn);
+ 		}
+ 	}
+
+	
+	
+	
+
+}

@@ -1,0 +1,467 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Contact us</title>
+<link type='image/x-ico' rel='icon' href='/freight/img/chinaseaair.ico' />
+<script type="text/javascript" src="/freight/js/jquery.min.js"></script>
+<link type="text/css" rel="stylesheet" href="/freight/css/style.css" />
+<link type="text/css" rel="stylesheet" href="/freight/css/contactus.css" />
+<link rel="stylesheet" type="text/css" href="/freight/css/easyui.css">
+<script type="text/javascript" src="/freight/js/jquery.easyui.min.js"></script>
+<script type="text/javascript">
+	$(function() {
+
+		function showNotice(msg) {
+			var layer = document.createElement("div");
+			layer.id = "layer";
+			layer.innerHTML = msg;
+
+			var style = {
+				background : "#FF0000",
+				position : "absolute",
+				zIndex : 10,
+				width : "340px",
+				left : "55%",
+				top : "70%",
+				border : "1px #e2e2e2 solid",
+				color : "#fff",
+
+			}
+			for ( var i in style) {
+				layer.style[i] = style[i];
+			}
+			if (document.getElementById("layer") == null) {
+				document.body.appendChild(layer);
+				setTimeout("document.body.removeChild(layer)", 3000)
+			}
+		}
+
+		function checkPhoneNumber(value) {
+			var regInternation = /^\s*\+?\s*(\(\s*\d+\s*\)|\d+)(\s*-?\s*(\(\s*\d+\s*\)|\s*\d+\s*))*\s*$/;//国际正则
+			//var reg1 = /^(([0\+]\d{2,3}-)?(0\d{2,3})-)?(\d{7,8})(-(\d{3,}))?$/;
+			//var regTel = /^(\(\d{3,4}\)|\d{3,4}-|\s)?\d{7,14}$/;//国内电话正则
+			//var regPhone = /^1[34578]\d{9}$/;//国内手机正则
+			if (value == "") {
+				return false;
+			} else if (regInternation.test(value)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		function checkEmail(value) {
+			//var regTel = /.+@.+\.[a-zA-Z]{2,4}$/;//
+			var regGeneral = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/;
+			if (value == "") {
+				return false;
+			} else if (regGeneral.test(value)) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		var sessionStorage = window.sessionStorage;
+		var trafficType = sessionStorage.getItem("trafficType");
+		var showRecords = sessionStorage.getItem("showRecords");
+		var selectRecords = sessionStorage.getItem("selectRecords");
+		if (showRecords == null || $.trim(showRecords) == "") {
+			$("#homeValue").hide();
+			$("#isFcl").attr("checked", false);
+			$("#containersNumberDiv").hide();
+			$("#goodsSize").show();
+		} else {
+			$("#isFcl").hide();
+			$("#checkboxDesc").hide();
+			if (trafficType == "fcl") {
+				$("#isFcl").attr("checked", true);
+				$("#containersNumberDiv").show();
+				$("#goodsSize").hide();
+			} else {
+				$("#isFcl").attr("checked", false);
+				$("#containersNumberDiv").hide();
+				$("#goodsSize").show();
+			}
+			$("#isFcl").attr("disabled", true);
+			$("#homeValue").show();
+			$("#showInfo").append(showRecords);
+		}
+
+		var ok1 = false;
+		var ok2 = false;
+		var ok3 = false;
+		var ok4 = false;
+		//如果是必填的，则加红星标识.
+		/* $("form :input.required").each(function() {
+			var $required = $("<strong class='high'> *</strong>"); //创建元素
+			$(this).parent().append($required); //然后将它追加到文档中
+		}); */
+		//文本框失去焦点后
+		$('form :input')
+				.blur(
+						function() {
+
+							var $parent = $(this).parent();
+							$parent.find(".formtips").remove();
+							/* //验证用户名
+							if ($(this).is('#companyName')) {
+								if (this.value == "") {
+									$parent
+											.append('<span class="formtips onError">  ×</span>');
+									ok1 = false;
+								} else {
+									$parent
+											.append('<span class="formtips onSuccess">  √</span>');
+									ok1 = true;
+								}
+							}
+							//iphoneNumber
+							if ($(this).is('#phoneNumber')) {
+								if (!checkPhoneNumber(this.value)) {
+									$parent
+											.append('<span class="formtips onError">  ×</span>');
+									ok2 = false;
+								} else {
+									$parent
+											.append('<span class="formtips onSuccess">  √</span>');
+									ok2 = true;
+								}
+							} */
+							//验证邮件
+							if ($(this).is('#email')) {
+								if (!checkEmail(this.value)) {
+									$parent
+											.append('<span class="formtips onError">  ×</span>');
+									ok3 = false;
+								} else {
+									$parent
+											.append('<span class="formtips onSuccess">  √</span>');
+									ok3 = true;
+								}
+							}
+							//验证货物
+							if ($(this).is('#shipping')) {
+								var spVl = $.trim(this.value);
+								if (spVl == "") {
+									$parent
+											.append('<span class="formtips onError">  ×</span>');
+									ok4 = false;
+								} else {
+									$parent
+											.append('<span class="formtips onSuccess">  √</span>');
+									ok4 = true;
+								}
+							}
+						}).keyup(function() {
+					$(this).triggerHandler("blur");
+				}).focus(function() {
+					$(this).triggerHandler("blur");
+				});//end blur
+		$('.sub')
+				.click(
+						function() {
+							$("#submitWait").show();
+
+							/* var companyName = $("#companyName").val();
+							var phoneNumber = $("#phoneNumber").val(); */
+							var email = $("#email").val();
+							var shipping = $("#shipping").val();
+							var QulaityControl = document
+									.getElementById("QulaityControl");
+							var otherService = "";
+							if (QulaityControl.checked) {
+								otherService += "1,";
+							}
+							var ProductSourcing = document
+									.getElementById("ProductSourcing");
+							if (ProductSourcing.checked) {
+								otherService += "2,";
+							}
+							var newotherService = otherService.substring(0,
+									otherService.length - 1);
+							var otherComments = $("#otherComments").val();
+
+							var isFcl = $("#isFcl").is(':checked');
+							if ((trafficType == null || trafficType == "")
+									&& isFcl) {
+								trafficType = "fcl";
+							}
+							var containersNumber = $("#containersNumber").val();
+							var weight = $("#weight").val();
+							var volume = $("#volume").val();
+							var isSp = ($.trim(shipping) != null && $.trim(shipping) != "");
+							var isEl = checkEmail(email);
+							if (isSp && isEl) {
+								$
+										.ajax({
+											type : "post",
+											url : "/freight/insetCustomer.do",
+											datatype : "json",
+											data : {
+												"trafficType" : trafficType == "" ? ""
+														: $.trim(trafficType),
+												"selectRecords" : $
+														.trim(selectRecords),
+												/* "companyName" : $
+														.trim(companyName),
+												"phoneNumber" : $
+														.trim(phoneNumber), */
+												"email" : $.trim(email),
+												"shipping" : $.trim(shipping),
+												"containersNumber" : $
+														.trim(containersNumber),
+												"weight" : $.trim(weight),
+												"volume" : $.trim(volume),
+												"otherService" : $
+														.trim(newotherService),
+												"otherComments" : $
+														.trim(otherComments
+																.toString()),
+												"trafficType" : trafficType,
+												"selectRecords" : selectRecords == null ? ""
+														: selectRecords
+											},
+											success : function(data) {
+												$("#submitWait").hide();
+												if(data.success){
+													$.messager.alert("Notice","Submit data successfully!","info",
+															function() {
+																window.location.href = "/freight/index.html";
+															}); 
+												} else{
+													showNotice(data.message);
+												}
+												
+											},
+											error : function(msg) {
+												$("#submitWait").hide();
+												showNotice('Submit data failure,Please try again!');
+											}
+										});
+
+							} else {
+								$("#submitWait").hide();
+								showNotice('The data did not fill out or fill in the format is not correct!');
+							}
+
+						});
+	})
+
+	function isFclChange() {
+		var isCheck = $("#isFcl").is(':checked');
+		if (isCheck) {
+			$("#containersNumberDiv").show();
+			$("#goodsSize").hide();
+		} else {
+			$("#containersNumberDiv").hide();
+			$("#goodsSize").show();
+		}
+	}
+
+	function numberOnkeyup(value) {
+		var nwVal = "";
+		if (value.match(/^\d{10}$/)) {
+			nwVal = value.replace(value, parseInt(value / 10));
+			nwVal = value.replace(/\.\d*\./g, '."');
+			return nwVal;
+		} else {
+			return nwVal;
+		}
+	}
+
+	function numberOnKeyPress(event, value) {
+		if ((event.keyCode<48|| event.keyCode>57) && event.keyCode != 46
+				&& event.keyCode != 45 || value.match(/^\d{10}$/)
+				|| /\.\d{10}$/.test(value)) {
+			event.returnValue = false;
+			return;
+		}
+		if (value.indexOf('.') != -1 && event.keyCode == 46) {
+			event.returnValue = false;
+			return;
+		}
+		if (value.indexOf('.') != -1) {
+			var numberlst = value.split(".");
+			if (numberlst[1].length > 1) {
+				event.returnValue = false;
+				return;
+			}
+		}
+	}
+</script>
+
+<style>
+.tank_bj {
+	width: 100%;
+	height: 100%;
+	background: #fff;
+	opacity: 0.9;
+	position: fixed;
+	left: 0;
+	right: 0px;
+	bottom: 0px;
+	right: 0px;
+	z-index: 101;
+}
+
+.tank_search {
+	position: fixed;
+	left: 45%;
+	top: 45%;
+	z-index: 102;
+}
+</style>
+</head>
+
+<body>
+	<div id="submitWait" style="display: none;">
+		<div class="tank_bj"></div>
+		<div class="tank_search">
+			<img src="/freight/img/wait.gif">
+		</div>
+	</div>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#"><img
+					src="/freight/img/logo_2.png" style="margin-top: 10px;" /></a>
+				<ul class="navbar-nav">
+					<li><a href="/freight/index.html" class="dropdown-toggle">Home</a></li>
+					<li><a href="/freight/Aboutus.html">About us</a></li>
+					<li><a href="/freight/Contactus.html" class="active"
+						data-toggle="dropdown"> Contact us <b class="caret"></b>
+					</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<!--以上为head部分-->
+	<div class="cont_mind">
+		<div class="container cont_bj">
+			<div class="back">
+				<img src="/freight/img/back_a.png"></img><a
+					href="/freight/index.html">Back</a>
+			</div>
+
+			<div class="biaodan">
+
+				<form id="infoform" method="post" name="from"
+					onsubmit="return beforeSubmit(this);">
+					<h2>Contact us</h2>
+
+					<div id="homeValue" style="width: 100%;">
+						<p id="showInfo"></p>
+					</div>
+
+					<table>
+						<!-- <tr>
+							<td class="int"><label for="companyName">Your
+									Company Name:</label> <input type="text" name="companyName"
+								id="companyName" class="required"></input></td>
+						</tr>
+						<tr>
+							<td class="int"><label for="phoneNumber">Your Phone
+									Number:</label> <input type="text" name="phoneNumber" id="phoneNumber"
+								class="required"></input></td>
+						</tr> -->
+						<tr>
+							<td class="int"><label for="email">Your Email
+									Address:</label> <input type="text" name="email" id="email"
+								class="required"></input></td>
+						</tr>
+						<tr>
+							<td class="int"><label for="shipping">What are you
+									shipping?</label> <input type="text" name="shipping" class="required"
+								id="shipping"></input></td>
+						</tr>
+						<tr>
+							<td class="int"><input type="checkbox" name="isFcl"
+								id="isFcl" style="width: 25px; height: 25px; float: left"
+								onchange="isFclChange()"></input><span id="checkboxDesc"
+								style="line-height: 30px; height: 30px;">click if it is
+									full container load</span>
+								<div id="containersNumberDiv">
+									<label for="containersNumber">Number of Containers:</label> <input
+										type="text" name="containersNumber" id="containersNumber"
+										onkeyup='this.value=this.value.replace(/\D/gi,"")'></input>
+								</div></td>
+						</tr>
+						<tr>
+							<td class="int">
+								<div id="goodsSize">
+									<label class="volum_lab" for="weight">Weight:</label> <input
+										type="text" name="weight" id="weight" class="volum_inp"
+										onkeyup="numberOnkeyup(this.value)"
+										onKeyPress="numberOnKeyPress(event,this.value)"></input><span
+										class="volum_dw"> KG</span><label for="volume"
+										class="volum_lab">Volume:</label> <input type="text"
+										name="volume" id="volume" class="volum_inp"
+										onkeyup="numberOnkeyup(this.value)"
+										onKeyPress="numberOnKeyPress(event,this.value)"></input><span
+										class="volum_dw "> CBM</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td>Besides Logistics Services, would you be interested our
+								following services:</td>
+						</tr>
+						<tr>
+							<td>
+								<div style="width: 100%; float: left;">
+
+									<input type="checkbox" id="QulaityControl"
+										style="width: 25px; height: 25px; float: left"></input> <span
+										style="line-height: 30px; height: 30px;">Qulaity
+										Control</span>
+								</div>
+								<div style="width: 100%; float: left;">
+
+									<input type="checkbox" id="ProductSourcing"
+										style="width: 25px; height: 25px; float: left;"></input> <span
+										style="line-height: 30px; height: 30px;">Product
+										Sourcing<em
+										style="font-size: 0.9em; font-weight: 400; font-style: unset; line-height: 18px;">(If
+											you send us product pictures, specs and order quantity, our <i
+											style="float: left;">sourcing team can help you find high
+												quality factories and lowest price on the market.)</i>
+									</em>
+									</span>
+								</div>
+
+							</td>
+						</tr>
+						<tr>
+
+							<td>Other Comments:</td>
+						</tr>
+						<tr>
+							<td><textarea id="otherComments" name="otherComments"
+									rows="5" cols="60"
+									style="border: 1px #000 solid; border-radius: 3px;"
+									placeholder="Please enter your comments"></textarea></td>
+						</tr>
+						<tr>
+							<td><input type="button" value="Submit" class="sub"></td>
+
+						</tr>
+
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="banquan dingw">
+		<div class="container">
+			<ul>
+				<li class="tail_li2"><img src="/freight/img/foot_logo.png"></li>
+				<li class="tail_li3">Copyright 2017 <a href="#">www.chinaseaair.com</a>
+					All rights reserved.
+				</li>
+			</ul>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+package com.cal.quartz;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+
+
+//@Component("synExchangeRateByDay")  
+//public class SynExchangeRateByDay {
+//
+//	    @Scheduled(cron = "0 0 12 * * ?")  
+//	    public void job1() {  
+//	    	MyTimerTask task = new MyTimerTask();
+//	    	task.run();
+//	        System.out.println("任务进行中。。。");  
+//	    }  
+	    
+//	    @Scheduled(cron="0/30 * *  * * ? ")  
+//	    public void job3() {  
+//	    	MyTimerTask task = new MyTimerTask();
+//	    	task.run();
+//	    	System.out.println("任务进行中。。。");  
+//	    }  
+	    
+	    
+//	    @Scheduled(cron="0/5 * *  * * ? ")	    
+//	    @Scheduled(cron = " 0 0 12 ? * SAT")  
+//	    public void job2() {  
+//	    	MyTimerTask task = new MyTimerTask();
+//	    	task.updateRate(currencyShorthand, rate);
+//	    	System.out.println("更新价格表成功");  
+//	    }  
+//}
+
+
+@Component("synExchangeRateByDay")  
+public class SynExchangeRateByDay {
+
+	    @Scheduled(cron = "0 0 12 * * ?")  
+//	    @Scheduled(cron="0/30 * *  * * ? ")
+	    public void job1() {  
+	    	MyTimerTask task = new MyTimerTask();
+	    	task.run(); 
+	    }  
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.mapper.SteelSortDetailsMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.model.SteelSortDetails">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="steel_type" property="steelType" jdbcType="VARCHAR" />
+		<result column="steel_sort" property="steelSort" jdbcType="VARCHAR" />
+		<result column="image_addr" property="imageAddr" jdbcType="VARCHAR" />
+		<result column="belong_type" property="belongType" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, steel_type, steel_sort, image_addr, belong_type 
+	</sql>
+
+	<select id="queryBySteelType" resultMap="BaseResultMap" parameterType="string">
+		select
+		distinct(image_addr),<include refid="Base_Column_List" />
+		from steel_sort_details
+		where steel_type = #{steelType,jdbcType=VARCHAR}
+	</select>
+	
+    <!-- 根据从属类型查询 -->
+	<select id="queryByBelongType" resultMap="BaseResultMap" parameterType="string">
+		select
+		<include refid="Base_Column_List" />
+		from steel_sort_details 
+		where belong_type = #{belongType,jdbcType=VARCHAR} 
+		GROUP BY image_addr
+	</select>
+	
+	<!-- 根据从属类型查询详细种类 -->
+	<select id="querySortByBelongType" resultType="string" parameterType="string">
+		select steel_sort 
+		from steel_sort_details 
+		where belong_type = #{belongType,jdbcType=VARCHAR} 
+	</select>
+    
+    
+
+	
+
+</mapper>

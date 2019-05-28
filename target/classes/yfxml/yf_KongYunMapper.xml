@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.KongYunMapper">
+	<resultMap id="BaseResultMap" type="com.yf.bean.KongYun">
+		<id column="itemId" property="itemid" jdbcType="INTEGER" />
+		<result column="youXiaoQi" property="youxiaoqi" jdbcType="DATE" />
+		<result column="huoDaiCompany" property="huodaicompany"
+			jdbcType="VARCHAR" />
+		<result column="qiDianPort" property="qidianport" jdbcType="VARCHAR" />
+		<result column="zhongDianPort" property="zhongdianport"
+			jdbcType="VARCHAR" />
+		<result column="qiDianRegion" property="qiDianRegion" jdbcType="VARCHAR" />
+		<result column="zhongDianRegion" property="zhongDianRegion"
+			jdbcType="VARCHAR" />
+		<result column="plus45" property="plus45" jdbcType="VARCHAR" />
+		<result column="plus100" property="plus100" jdbcType="VARCHAR" />
+		<result column="plus300" property="plus300" jdbcType="VARCHAR" />
+		<result column="plus500" property="plus500" jdbcType="VARCHAR" />
+		<result column="plus1000" property="plus1000" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		itemId, youXiaoQi, huoDaiCompany,
+		qiDianPort,zhongDianPort,qiDianRegion,
+		zhongDianRegion, plus45,
+		plus100,plus300,plus500, plus1000
+	</sql>
+	<!-- 动态查询 -->
+
+	<select id="getHotKongYun" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyuntable_hot
+		order by qiDianPort,zhongDianPort
+	</select>
+
+	<select id="getAllKongYun" resultMap="BaseResultMap"
+		parameterType="com.yf.bean.QueryPortInfo">
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyuntable
+		where 1=1
+		<if test="depaPortAbbreviation !=null and depaPortAbbreviation != ''">
+			and (qiDianRegion =
+			#{depaPortAbbreviation,jdbcType=VARCHAR})
+		</if>
+		<if test="destPortAbbreviation !=null and destPortAbbreviation != ''">
+			and (zhongDianRegion =
+			#{destPortAbbreviation,jdbcType=VARCHAR} )
+		</if>
+
+		union
+
+		select
+		<include refid="Base_Column_List" />
+		from yf_kongyuntable_hot
+		where 1=1
+		<if test="depaPortAbbreviation !=null and depaPortAbbreviation != ''">
+			and (qiDianRegion =
+			#{depaPortAbbreviation,jdbcType=VARCHAR})
+		</if>
+		<if test="destPortAbbreviation !=null and destPortAbbreviation != ''">
+			and (zhongDianRegion =
+			#{destPortAbbreviation,jdbcType=VARCHAR} )
+		</if>
+
+	</select>
+	<!-- 根据起点，得到总条数 -->
+	<select id="getAllCount" resultType="Long" parameterType="com.yf.bean.KongYun">
+		select count(itemId) totalNumber from yf_kongyuntable
+		where 1=1
+		<if
+			test="(depaPortChName !=null and depaPortChName != '') or (depaPortEnName !=null and depaPortEnName != '')">
+			and (qiDianPort like
+			CONCAT('%',#{depaPortChName,jdbcType=VARCHAR},'%')
+			or qiDianPort like
+			CONCAT('%',#{depaPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+		<if
+			test="(destPortChName !=null and destPortChName != '') or (destPortEnName !=null and destPortEnName != '')">
+			and (zhongDianPort like
+			CONCAT('%',#{destPortChName,jdbcType=VARCHAR},'%')
+			or zhongDianPort
+			like
+			CONCAT('%',#{destPortEnName,jdbcType=VARCHAR},'%'))
+		</if>
+
+	</select>
+</mapper>

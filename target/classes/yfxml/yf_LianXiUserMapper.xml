@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.LianXiUserMapper" >
+  <resultMap id="BaseResultMap" type="com.yf.bean.LianXiUser" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="userName" property="username" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="huoWu" property="huowu" jdbcType="VARCHAR" />
+    <result column="leiXing" property="leixing" jdbcType="VARCHAR" />
+    <result column="yiJian" property="yijian" jdbcType="VARCHAR" />
+    <result column="isKAM" property="iskam" jdbcType="INTEGER" />
+    <result column="iphone" property="iphone" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, userName, email, huoWu, leiXing, yiJian, isKAM,iphone
+  </sql>
+<!--   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" > -->
+<!--     select  -->
+<!--     <include refid="Base_Column_List" /> -->
+<!--     from yf_lianxiuser -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </select> -->
+<!--   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" > -->
+<!--     delete from yf_lianxiuser -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </delete> -->
+<!--   <insert id="insert" parameterType="com.yf.bean.LianXiUser" > -->
+<!--     insert into yf_lianxiuser (id, userName, email,  -->
+<!--       huoWu, leiXing, yiJian,  -->
+<!--       isKAM) -->
+<!--     values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},  -->
+<!--       #{huowu,jdbcType=VARCHAR}, #{leixing,jdbcType=INTEGER}, #{yijian,jdbcType=VARCHAR},  -->
+<!--       #{iskam,jdbcType=INTEGER}) -->
+<!--   </insert> -->
+  <insert id="insertSelective" parameterType="com.yf.bean.LianXiUser" >
+    insert into yf_lianxiuser
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="username != null" >
+        userName,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="huowu != null" >
+        huoWu,
+      </if>
+      <if test="leixing != null" >
+        leiXing,
+      </if>
+      <if test="yijian != null" >
+        yiJian,
+      </if>
+      <if test="iskam != null" >
+        isKAM,
+      </if>
+      <if test="iphone != null" >
+        iphone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="huowu != null" >
+        #{huowu,jdbcType=VARCHAR},
+      </if>
+      <if test="leixing != null" >
+        #{leixing,jdbcType=VARCHAR},
+      </if>
+      <if test="yijian != null" >
+        #{yijian,jdbcType=VARCHAR},
+      </if>
+      <if test="iskam != null" >
+        #{iskam,jdbcType=INTEGER},
+      </if>
+       <if test="iphone != null" >
+        #{iphone,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+<!--   <update id="updateByPrimaryKeySelective" parameterType="com.yf.bean.LianXiUser" > -->
+<!--     update yf_lianxiuser -->
+<!--     <set > -->
+<!--       <if test="username != null" > -->
+<!--         userName = #{username,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="email != null" > -->
+<!--         email = #{email,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="huowu != null" > -->
+<!--         huoWu = #{huowu,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="leixing != null" > -->
+<!--         leiXing = #{leixing,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--       <if test="yijian != null" > -->
+<!--         yiJian = #{yijian,jdbcType=VARCHAR}, -->
+<!--       </if> -->
+<!--       <if test="iskam != null" > -->
+<!--         isKAM = #{iskam,jdbcType=INTEGER}, -->
+<!--       </if> -->
+<!--     </set> -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </update> -->
+<!--   <update id="updateByPrimaryKey" parameterType="com.yf.bean.LianXiUser" > -->
+<!--     update yf_lianxiuser -->
+<!--     set userName = #{username,jdbcType=VARCHAR}, -->
+<!--       email = #{email,jdbcType=VARCHAR}, -->
+<!--       huoWu = #{huowu,jdbcType=VARCHAR}, -->
+<!--       leiXing = #{leixing,jdbcType=INTEGER}, -->
+<!--       yiJian = #{yijian,jdbcType=VARCHAR}, -->
+<!--       isKAM = #{iskam,jdbcType=INTEGER} -->
+<!--     where id = #{id,jdbcType=INTEGER} -->
+<!--   </update> -->
+</mapper>

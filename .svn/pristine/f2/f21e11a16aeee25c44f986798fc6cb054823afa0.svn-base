@@ -1,0 +1,74 @@
+package com.cal.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cal.bean.MaterialInfo;
+import com.cal.dao.MaterialInfoMapper;
+import com.cal.dao.MaterialPriceMapper;
+import com.cal.service.MaterialPriceService;
+import com.cal.util.DateFormat;
+
+
+@Service
+public class MaterialPriceServiceImpl implements MaterialPriceService {
+
+	@Resource
+	private MaterialPriceMapper materialPriceMapper;	
+	@Resource
+	private MaterialInfoMapper materialInfoMapper;
+	
+	
+	@Transactional
+	@Override
+	public void updateMaterialPrice() {
+		String materialType = "";  //材质类型
+		String priceReplace = "";  //替换的内容
+		String replaceType = "";   //替换的材质
+		int replacePrice = 0;      //替换的价格
+		List<MaterialInfo> materialInfos = materialInfoMapper.queryAllGroupByType();
+		for (MaterialInfo materialInfo : materialInfos) {
+			materialType = materialInfo.getMaterialType();
+			priceReplace = materialInfo.getPriceReplace();
+			
+			//判断当前替换的材质类型和加减数值
+			//生成新的价格，更新材质价格表
+			if(priceReplace.contains("-") || priceReplace.contains("+")){
+					if(priceReplace.contains("+")){
+						String[] split = priceReplace.split("\\+");
+						replaceType = split[0];
+						replacePrice = Integer.parseInt(split[1]);
+						Integer price = materialPriceMapper.getPriceByType(replaceType);
+						if(price != null && price > 0){
+							String updateDate = DateFormat.currentDate();
+							int newPrice = price+replacePrice;
+							materialInfoMapper.updateMaterialPriceByType(newPrice, materialType,updateDate);
+						}
+					}			
+					if(priceReplace.contains("-")){
+						String[] split = priceReplace.split("-");
+						replaceType = split[0];
+						replacePrice = Integer.parseInt(split[1]);
+						Integer price = materialPriceMapper.getPriceByType(replaceType);
+						if(price != null && price > 0){
+							String updateDate = DateFormat.currentDate();
+							materialInfoMapper.updateMaterialPriceByType(price-replacePrice, materialType,updateDate);
+						}
+					}			
+			}else{
+				 Integer price = materialPriceMapper.getPriceByType(priceReplace);
+				 if(price != null && price > 0){
+						String updateDate = DateFormat.currentDate();
+						materialInfoMapper.updateMaterialPriceByType(price, materialType,updateDate);
+				 }
+			}			
+		}
+		
+		
+	}
+	
+}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.CustomerDrawingNameMapper">
+	<resultMap id="customerDrawingNameResultMap" type="com.cal.bean.CustomerDrawingName">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="quoteId" property="quoteId" jdbcType="VARCHAR" />
+		<result column="emold_name" property="emoldName" jdbcType="VARCHAR" />
+		<result column="original_name" property="originalName" jdbcType="VARCHAR" />
+		<result column="customer_id" property="customerId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="customerDrawingNameColumnList">
+		id,quoteId,emold_name,original_name,customer_id
+	</sql>
+
+
+	<insert id="insertCustomerDrawingName" useGeneratedKeys="true" keyProperty="id" parameterType="com.cal.bean.CustomerDrawingName">
+		insert into customer_drawing_name
+		(
+        id,quoteId,emold_name,original_name,customer_id
+		)
+		values 
+		(
+		#{id,jdbcType=INTEGER},
+		#{quoteId,jdbcType=VARCHAR},
+		#{emoldName,jdbcType=VARCHAR},
+		#{originalName,jdbcType=VARCHAR},
+		#{customerId,jdbcType=INTEGER}
+		)
+	</insert>
+   
+   
+    <!-- 批量插入数据 -->
+	<insert id="insertCustomerDrawingNames" parameterType="java.util.List">
+	    insert into customer_drawing_name
+		    (
+            quoteId,emold_name,original_name,customer_id
+            )
+	    values
+	    <foreach collection="list" item="item" index="index" separator=",">
+	      (           
+		    #{item.quoteId},#{item.emoldName},
+		    #{item.originalName},#{item.customerId}
+	      )
+	    </foreach>
+	 </insert>
+
+
+     <select id="queryRepeate" resultMap="customerDrawingNameResultMap">
+           select 
+           <include refid="customerDrawingNameColumnList"/>
+           from customer_drawing_name  
+		   where original_name in
+	    <foreach collection="array" item="originalName" open="(" close=")" separator=",">
+			#{originalName}
+		</foreach>
+		<if test="quoteId != null">
+			and quoteId = #{quoteId,jdbcType=VARCHAR},
+		</if>
+             
+     </select>
+</mapper>

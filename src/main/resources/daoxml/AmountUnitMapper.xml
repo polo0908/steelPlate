@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.AmountUnitMapper">
+
+	<resultMap id="amountUnitResultMap" type="com.cal.bean.AmountUnit">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="currency" property="currency" jdbcType="VARCHAR" />
+		<result column="currency_shorthand" property="currencyShorthand" jdbcType="VARCHAR" />
+		<result column="exchange_rate" property="exchangeRate" jdbcType="DOUBLE" />
+		<result column="update_date" property="updateDate" jdbcType="DATE" />
+	</resultMap> 
+
+    <sql id="amountUnitColumnList">
+        id,currency,currency_shorthand,exchange_rate,update_date
+    </sql>
+    <!-- 查询所有国家汇率 -->
+    <select id="queryAll" resultMap="amountUnitResultMap">
+       select 
+       <include refid="amountUnitColumnList"/>
+       from amount_unit 
+    </select>
+    
+    <!-- 根据国家货币简称查询汇率 -->
+    <select id="queryByCurrencyShorthand" resultMap="amountUnitResultMap" parameterType="string">
+       select 
+       <include refid="amountUnitColumnList"/>
+       from amount_unit
+       where currency_shorthand = #{currencyShorthand,jdbcType=VARCHAR} 
+    </select>
+    
+	<!-- 根据国家查询汇率 -->
+    <select id="queryByCurrency" resultMap="amountUnitResultMap" parameterType="string">
+          select 
+          <include refid="amountUnitColumnList"/>
+          from amount_unit  
+          where currency = #{currency,jdbcType=VARCHAR}  
+    </select>
+    
+	<!-- 根据id查询汇率 -->
+    <select id="queryById" resultMap="amountUnitResultMap" parameterType="int">
+          select 
+          <include refid="amountUnitColumnList"/>
+          from amount_unit  
+          where id = #{id,jdbcType=INTEGER}  
+    </select>
+
+    <!-- 更新汇率(每天更新一次) -->
+	<update id="updateRate">
+	      update amount_unit 
+	      <set>
+	        <if test="exchangeRate != null">
+	           exchange_rate = #{exchangeRate,jdbcType=DOUBLE},
+	        </if>	      
+	      </set>
+	      where currency_shorthand = #{currencyShorthand,jdbyType=VARCHAR}
+	</update>
+</mapper>

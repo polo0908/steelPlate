@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yf.dao.HaiYunPortMapper">
+	<resultMap id="BaseResultMap" type="com.yf.bean.HaiYunPort">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="enPortName" property="enportname" jdbcType="VARCHAR" />
+		<result column="chPortName" property="chportname" jdbcType="VARCHAR" />
+		<result column="enGuoName" property="enguoname" jdbcType="VARCHAR" />
+		<result column="chGuoName" property="chguoname" jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, enPortName, chPortName, enGuoName, chGuoName
+	</sql>
+	<select id="selectName" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_haiyunport where 1=1
+		<if test="_parameter!=null and _parameter!=''">
+			and chPortName = #{_parameter}
+		</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from yf_haiyunport where 1=1
+		and id = #{id}
+	</select>
+	<!-- 除去中国的动态搜索框 -->
+	<select id="ajaxDoctorName" parameterType="String" resultType="com.yf.bean.HaiYunPort">
+
+		select <include refid="Base_Column_List" /> 
+		from yf_haiyunport 
+		where 1=1 and (enPortName like
+		CONCAT(#{doctor_name},'%') or chPortName like
+		CONCAT(#{doctor_name},'%')) and chGuoName !='中国'
+		order by enPortName
+		<!-- limit 0,8 -->
+	</select>
+	<!-- 中国出发港 -->
+	<select id="ajaxChuFa" parameterType="String" resultType="com.yf.bean.HaiYunPort">
+
+		select <include refid="Base_Column_List" /> 
+		from yf_haiyunport 
+		where 1=1 and (enPortName like
+		CONCAT(#{doctor_name},'%') or chPortName like
+		CONCAT(#{doctor_name},'%')) and chGuoName ='中国'
+		order by enPortName
+		<!-- limit 0,8 -->
+	</select>
+	<select id="getAllPort" resultMap="BaseResultMap">
+	   select 
+	   <include refid="Base_Column_List" />
+	    from yf_haiyunport
+	    order by enPortName
+	</select>
+	
+	<!-- 中国整箱出发港 -->
+	<select id="queryFclDeparturePort" resultType="com.yf.bean.HaiYunPort">
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, 
+		yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_zhengguitable
+		where enPortName = qiDianRegion and zhongDianRegion in('NEW YORK','LOS ANGELES','HAMBURG','FELIXSTOWE','ROTTERDAM')
+		UNION
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, 
+		yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_zhengguitable_hot
+		where enPortName = qiDianRegion and zhongDianRegion in('NEW YORK','LOS ANGELES','HAMBURG','FELIXSTOWE','ROTTERDAM')
+	</select>
+	
+	<!-- 国外整箱目的港 -->
+	<select id="queryFclDestinationPort" resultType="com.yf.bean.HaiYunPort">
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, 
+		yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_zhengguitable
+		where enPortName = zhongDianRegion  and qiDianRegion in('SHANGHAI','NINGBO','SHENZHEN','GUANGZHOU','QINGDAO')
+		UNION
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, 
+		yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_zhengguitable_hot
+		where enPortName = zhongDianRegion and qiDianRegion in('SHANGHAI','NINGBO','SHENZHEN','GUANGZHOU','QINGDAO')
+	</select>
+	
+	<!-- 中国拼箱出发港 -->
+	<select id="queryLclDeparturePort" resultType="com.yf.bean.HaiYunPort">
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_pinxiangtable
+		where enPortName = qiDianRegion and zhongDianRegion in('NEW YORK','LOS ANGELES','HAMBURG','FELIXSTOWE','ROTTERDAM')
+		UNION
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_pinxiangtable_hot
+		where enPortName = qiDianRegion and zhongDianRegion in('NEW YORK','LOS ANGELES','HAMBURG','FELIXSTOWE','ROTTERDAM')
+	</select>
+	
+	<!-- 国外拼箱目的港 -->
+	<select id="queryLclDestinationPort" resultType="com.yf.bean.HaiYunPort">
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_pinxiangtable
+		where enPortName = zhongDianRegion  and qiDianRegion in('SHANGHAI','NINGBO','SHENZHEN','GUANGZHOU','QINGDAO')
+		UNION
+		select distinct yf_haiyunport.id, yf_haiyunport.enPortName, yf_haiyunport.chPortName, yf_haiyunport.enGuoName, yf_haiyunport.chGuoName
+		from yf_haiyunport,yf_pinxiangtable_hot
+		where enPortName = zhongDianRegion and qiDianRegion in('SHANGHAI','NINGBO','SHENZHEN','GUANGZHOU','QINGDAO')
+	</select>
+	
+	
+	<!-- 查询海运有拼箱运输的国家 -->
+	 <select id="queryLclCountry" resultType="com.yf.bean.HaiYunPort">
+		 select DISTINCT enGuoName from 
+		 (
+		    (
+             select  * from yf_pinxiangtable 
+		    )
+		     UNION
+		    (
+             select * from yf_pinxiangtable_hot
+		    )
+		 )pin 
+		 LEFT JOIN
+		 (select DISTINCT enGuoName,enPortName from yf_haiyunport)haiyun
+		 on pin.zhongDianRegion = haiyun.enPortName	 
+		 ORDER BY binary CONVERT(`enGuoName` USING GBK) ASC 
+	 </select>
+	 
+
+</mapper>

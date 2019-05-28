@@ -1,0 +1,327 @@
+package com.cal.print;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import com.cal.bean.ClientOrder;
+import com.cal.bean.OrderDetails;
+import com.cal.bean.QuotationVO;
+import com.cal.util.DownloadUtil;
+import com.cal.util.UtilFuns;
+
+
+/**
+ * @Description: 根据模板文件打印，复制sheet，然后写单元格值；最终删除模板sheet，不留痕迹；这样样式工作可视化，无需代码，同时也加快的展现效率；
+ * @Author:	polo
+ * @CreateDate:	2017/2/27
+ */
+
+public class ContractPrintTemplate {
+	
+	public void print(QuotationVO quotation,String path, HttpServletResponse response,HttpServletRequest request,
+			List<String> ms, List<String> gs) throws ParseException, FileNotFoundException, IOException{
+		/*
+		 * 1.获取数据
+		 * 2.封装每页数据
+		 * 3.打印
+		 */
+		ClientOrder clientOrder = quotation.getClientOrder();
+		List<OrderDetails> list = quotation.getOrderDetails();		
+
+		int tl = list.size();
+		
+	     
+		/*
+		 * 打开模板，复制sheet，另存
+		 */
+		File file = new File(path+"calculator/xlsprint/CSG Quotation Ver3.xlsx");	
+
+			
+		FileInputStream fi = new FileInputStream(file);
+		XSSFWorkbook wb = new XSSFWorkbook(fi);
+			wb.cloneSheet(0);						//复制工作簿
+			wb.setSheetName(1, "Quotation");		//设置工作簿名称
+		
+
+			
+		    //设置相同内容
+			int rowNo = 2;
+			int colNo = 0;
+			Row nRow = null;
+			Cell nCell = null;
+			
+			XSSFSheet sheet = wb.getSheetAt(1);						//定位到当前工作表
+			sheet.setForceFormulaRecalculation(true);				//强制公式自动计算，利用模板时，模板中的公式不会因值发生变化而自动计算。
+			
+			if(tl > 10){
+				for(int j=0;j<tl-10;j++){
+				 insertRow(wb, sheet, 18, 1);	
+				 sheet.addMergedRegion(new CellRangeAddress(19, 19,(short)2,(short)6));
+				}								
+			}	
+			
+			nRow = sheet.getRow(rowNo++);
+			nCell = nRow.getCell(2);
+			nCell.setCellValue(UtilFuns.convertNull(clientOrder.getCity()) +","+UtilFuns.convertNull(clientOrder.getCountry()));
+			
+			nRow = sheet.getRow(rowNo++);
+			nCell = nRow.getCell(2);
+			nCell.setCellValue(UtilFuns.convertNull(clientOrder.getEmail()));
+			
+			nRow = sheet.getRow(rowNo++);
+			nCell = nRow.getCell(2);
+			nCell.setCellValue(clientOrder.getCreateTime());
+			nCell = nRow.getCell(6);
+			nCell.setCellValue("RFQ@csmfg.com");
+		
+			nRow = sheet.getRow(rowNo++);
+			nCell = nRow.getCell(2);
+			nCell.setCellValue("30 Days");
+			
+			Double unitPrice = 0.0;
+				for(int i = 0; i < tl; i++){
+				    rowNo = 9+i;
+				    nRow = sheet.getRow(rowNo);
+					nCell = nRow.getCell(1);
+					nCell.setCellValue(UtilFuns.convertNull(list.get(i).getPartName()));	
+					
+					nRow = sheet.getRow(rowNo);
+					nCell = nRow.getCell(2);
+					nCell.setCellValue(UtilFuns.convertNull(gs.get(i)) + "/" + UtilFuns.convertNull(ms.get(i)) +" "+list.get(i).getProductSize());				
+					
+					
+					nRow = sheet.getRow(rowNo);
+					nCell = nRow.getCell(7);
+					nCell.setCellValue(list.get(i).getGoodsSet());
+					
+					
+					nRow = sheet.getRow(rowNo);
+					nCell = nRow.getCell(8);
+					nCell.setCellValue(list.get(i).getPrice());
+					
+					
+					nRow = sheet.getRow(rowNo);
+					nCell = nRow.getCell(9);
+					nCell.setCellValue(list.get(i).getProductProcessPrice());	
+					
+			     	unitPrice +=(new BigDecimal(list.get(i).getProductProcessPrice()).add(new BigDecimal(list.get(i).getPrice()))).multiply(new BigDecimal(list.get(i).getGoodsSet())).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();	         
+				 }	
+
+			 if(tl > 10){
+			   rowNo = 9+tl; 
+			 }else{
+			   rowNo = 19; 
+			 }
+			 
+			 nRow = sheet.getRow(rowNo++);
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(unitPrice);
+			
+			 
+			 nRow = sheet.getRow(rowNo++);
+			 nCell = nRow.getCell(1);
+			 nCell.setCellValue("Profit,Management Cost:" + clientOrder.getProfitRate() * 100 + "%");
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(clientOrder.getProfitManagment());
+			 nCell = nRow.getCell(5);
+			 nCell.setCellValue(new BigDecimal(clientOrder.getTotalWeight()).setScale(1, BigDecimal.ROUND_DOWN).doubleValue());
+			 
+			 
+			 nRow = sheet.getRow(rowNo++);
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(clientOrder.getTax());
+			 nCell = nRow.getCell(5);
+			 nCell.setCellValue(clientOrder.getShippingFee());
+			  		 
+			 
+			 nRow = sheet.getRow(rowNo++);	
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(clientOrder.getFinallyPrice());
+			 nCell = nRow.getCell(5);
+			 nCell.setCellValue(clientOrder.getDiscount());
+
+			 
+			 rowNo++;
+			 nRow = sheet.getRow(rowNo++);
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(clientOrder.getTotalSets());
+			 nCell = nRow.getCell(5);
+			 nCell.setCellValue(clientOrder.getTotalPrice());
+			 
+			 nRow = sheet.getRow(rowNo++);
+			 nCell = nRow.getCell(2);
+			 nCell.setCellValue(clientOrder.getInlandShippingCost());
+			 nCell = nRow.getCell(5);
+			 nCell.setCellValue(clientOrder.getFobPrice());
+
+//			 ServletContext sctx = request.getSession().getServletContext();				
+//			 String pic1 = sctx.getRealPath("/calculator/xlsprint/img/1.png");
+//			 String pic2 = sctx.getRealPath("/calculator/xlsprint/img/2.png");
+//			 String pic3 = sctx.getRealPath("/calculator/xlsprint/img/3.png");
+//			 String pic4 = sctx.getRealPath("/calculator/xlsprint/img/4.png");
+//			 String pic5 = sctx.getRealPath("/calculator/xlsprint/img/5.png");
+//			 String pic6 = sctx.getRealPath("/calculator/xlsprint/img/6.png");
+//			 String pic7 = sctx.getRealPath("/calculator/xlsprint/img/7.png");
+//			 String pic8 = sctx.getRealPath("/calculator/xlsprint/img/8.png");
+             
+
+//			 if(tl > 10){
+//			     rowNo = 21+tl; 			   
+//				 setPicture(pic1, sheet, 21+tl, 1, 28+tl, 3);
+//				 setPicture(pic2, sheet, 21+tl, 3, 28+tl, 5);
+//				 setPicture(pic3, sheet, 21+tl, 5, 28+tl, 7);
+//				 setPicture(pic4, sheet, 21+tl, 7, 28+tl, 10);
+//				 setPicture(pic5, sheet, 29+tl, 1, 36+tl, 3);
+//				 setPicture(pic6, sheet, 29+tl, 3, 36+tl, 5);
+//				 setPicture(pic7, sheet, 29+tl, 5, 36+tl, 7);
+//				 setPicture(pic8, sheet, 29+tl, 7, 36+tl, 10);
+//			 }else{
+//			   rowNo = 31;
+//				 setPicture(pic1, sheet, 31, 1, 38, 3);
+//				 setPicture(pic2, sheet, 31, 3, 38, 5);
+//				 setPicture(pic3, sheet, 31, 5, 38, 7);
+//				 setPicture(pic4, sheet, 31, 7, 38, 10);
+//				 setPicture(pic5, sheet, 39, 1, 46, 3);
+//				 setPicture(pic6, sheet, 39, 3, 46, 5);
+//				 setPicture(pic7, sheet, 39, 5, 46, 7);
+//				 setPicture(pic8, sheet, 39, 7, 46, 10);
+//			 }
+			 
+
+		
+			 
+			 
+		wb.removeSheetAt(0);					//删除模板sheet
+		
+		DownloadUtil du = new DownloadUtil();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		wb.write(bos);
+		bos.close();
+//		du.download(bos, response, "CSG Quotation Ver.xlsx");
+		du.download(bos, response, "CSG_Quotation_Ver.xlsx");
+		wb.setFirstVisibleTab(1);
+		
+	}
+	
+	//处理图片，excel中图片是单独对象存放
+	public void setPicture(String pic, XSSFSheet sheet, int startRow, int startCol, int stopRow, int stopCol) throws IOException{
+		File imageFile = new File(pic);
+		if(imageFile.exists()){
+			InputStream is = new FileInputStream(new File(pic));
+			byte[] bytes = IOUtils.toByteArray(is);
+			int pictureIdx = sheet.getWorkbook().addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);		//扩展名可为.jpg/.jpeg/.png
+			is.close();
+			
+			XSSFDrawing drawing = sheet.createDrawingPatriarch();	// Create the drawing patriarch.  This is the top level container for all shapes.
+			//前面四个参数是图片偏移量
+			XSSFClientAnchor anchor = new XSSFClientAnchor(512, 255, 0, 0, (short)startCol, startRow, (short)stopCol, stopRow);	//add a picture shape
+			anchor.setRow1(startRow);							//set position corner of the picture		
+			anchor.setCol1(startCol);
+			anchor.setRow2(stopRow);
+			anchor.setCol2(stopCol);
+			
+			drawing.createPicture(anchor, pictureIdx);
+		}
+	}
+	
+	
+	public void print(HttpServletResponse response) throws ParseException, FileNotFoundException, IOException{
+
+		/*
+		 * 打开模板，复制sheet，另存
+		 */
+		HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream(new File("D:/apache-tomcat-7.0.57/wtpwebapps/steelPlate/calculator/xlsprint/tCONTRACT.xls")));
+		for(int i=0;i<2;i++){
+			wb.cloneSheet(0);								//复制工作簿
+			wb.setSheetName(i+1, "Sheet("+(i+1)+")");		//设置工作簿名称
+		}
+		
+		//设置相同内容
+		for(int i=1;i<wb.getNumberOfSheets();i++){
+			Row nRow = null;
+			Cell nCell = null;
+			
+			Sheet sheet = wb.getSheetAt(i);						//定位到当前工作表
+			System.out.println(sheet.getLastRowNum());
+			
+//			nRow = sheet.getRow(6);
+//			nCell = nRow.getCell(1);
+//			nCell.setCellValue("Offeror");
+			
+			System.out.println("=================================="+i);
+		}
+//		response.setContentType("applicationnd.ms-excel");
+//		response.setHeader("Content-disposition", "attachment;filename=subscribeEmail.xls");
+//		OutputStream ouputStream = response.getOutputStream();
+//		wb.write(ouputStream);
+//		ouputStream.flush();
+//		ouputStream.close();
+		
+		
+		wb.write(new FileOutputStream("e:\\ys.xls"));
+	}	
+
+	
+	
+//  Parameters:
+//  startRow - the row to start shifting
+//  endRow - the row to end shifting
+//  n - the number of rows to shift
+//  copyRowHeight - whether to copy the row height during the shift
+//  resetOriginalRowHeight - whether to set the original row's height to the default
+	public static void insertRow(XSSFWorkbook wb, XSSFSheet sheet, int starRow,int rows) {
+
+		
+		  sheet.shiftRows(starRow + 1, sheet.getLastRowNum(), rows,true,false);
+		  
+		  starRow = starRow - 1;
+
+		  for (int i = 0; i < rows; i++) {
+
+		   XSSFRow sourceRow = null;
+		   XSSFRow targetRow = null;
+		   XSSFCell sourceCell = null;
+		   XSSFCell targetCell = null;
+		   short m;
+
+		   starRow = starRow + 1;
+		   sourceRow = sheet.getRow(starRow);
+		   targetRow = sheet.createRow(starRow + 1);
+		   targetRow.setHeight(sourceRow.getHeight());
+
+		   for (m = sourceRow.getFirstCellNum(); m < sourceRow.getLastCellNum(); m++) {
+
+		    sourceCell = sourceRow.getCell(m);
+		    targetCell = targetRow.createCell(m);
+		    targetCell.setCellStyle(sourceCell.getCellStyle());
+		    targetCell.setCellType(sourceCell.getCellType());
+
+		   }
+		  }
+
+		 }
+
+	  
+}

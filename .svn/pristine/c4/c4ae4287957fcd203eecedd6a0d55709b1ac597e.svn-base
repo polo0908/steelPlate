@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.OrderDetailsMapper">
+	<resultMap id="orderDetailsResultMap" type="com.cal.bean.OrderDetails">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="quoteId" property="quoteId" jdbcType="VARCHAR" />
+		<result column="part_name" property="partName" jdbcType="VARCHAR" />
+		<result column="goods_type_id" property="goodsTypeId" jdbcType="INTEGER" />
+		<result column="material_id" property="materialId" jdbcType="INTEGER" />
+		<result column="parameter_mm" property="parameterMm" jdbcType="VARCHAR" />
+		<result column="product_size" property="productSize" jdbcType="VARCHAR" />
+		<result column="parameter_inch" property="parameterInch" jdbcType="VARCHAR" />
+		<result column="goods_set" property="goodsSet" jdbcType="INTEGER" />
+		<result column="weight" property="weight" jdbcType="DOUBLE" />
+		<result column="weight_unit" property="weightUnit" jdbcType="VARCHAR" />
+		<result column="superficial_area" property="superficialArea" jdbcType="DOUBLE" />
+		<result column="superficial_area_unit" property="superficialAreaUnit" jdbcType="VARCHAR" />
+		<result column="space" property="space" jdbcType="DOUBLE" />
+		<result column="space_unit" property="spaceUnit" jdbcType="VARCHAR" />
+		<result column="price" property="price" jdbcType="DOUBLE" />
+		<result column="product_process_price" property="productProcessPrice" jdbcType="DOUBLE" />
+		<result column="unit_price" property="unitPrice" jdbcType="DOUBLE" />
+		<result column="inside_outside_state" property="insideOutsideState" jdbcType="INTEGER" />
+	</resultMap>
+
+	<sql id="orderDetailsColumnList">
+		id,quoteId, part_name,goods_type_id,
+		material_id,parameter_mm,product_size,parameter_inch,
+		goods_set,weight,weight_unit,superficial_area,superficial_area_unit,
+		space, space_unit, price ,product_process_price,
+		unit_price,inside_outside_state  
+	</sql>
+
+	<select id="queryById" resultMap="orderDetailsResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="orderDetailsColumnList" />
+		from order_details
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<insert id="insertOrderDetails" useGeneratedKeys="true" keyProperty="id" parameterType="com.cal.bean.OrderDetails">
+		insert into order_details 
+		(
+		quoteId, part_name,goods_type_id,
+		material_id,parameter_mm,product_size,parameter_inch,
+		goods_set,weight,weight_unit,superficial_area,superficial_area_unit,
+		space, space_unit, price ,product_process_price,
+		unit_price,inside_outside_state   
+		)
+		values 
+		(
+		#{quoteId,jdbcType=VARCHAR},
+		#{partName,jdbcType=VARCHAR},
+		#{goodsTypeId,jdbcType=INTEGER},
+		#{materialId,jdbcType=INTEGER},
+		#{parameterMm,jdbcType=VARCHAR},
+		#{productSize,jdbcType=VARCHAR},
+		#{parameterInch,jdbcType=VARCHAR},
+		#{goodsSet,jdbcType=INTEGER},		
+		#{weight,jdbcType=DOUBLE},
+		#{weightUnit,jdbcType=VARCHAR},
+		#{superficialArea,jdbcType=DOUBLE},
+		#{superficialAreaUnit,jdbcType=VARCHAR},
+		#{space,jdbcType=DOUBLE},
+		#{spaceUnit,jdbcType=VARCHAR},
+		#{price,jdbcType=DOUBLE},
+		#{productProcessPrice,jdbcType=DOUBLE},
+		#{unitPrice,jdbcType=DOUBLE},
+		#{insideOutsideState,jdbcType=INTEGER}
+		)
+		
+	</insert>
+	
+    <select id="queryByQuoteId" resultMap="orderDetailsResultMap" parameterType="string">
+        select
+        <include refid="orderDetailsColumnList" />
+		from order_details 
+		where quoteId = #{quoteId,jdbcType=VARCHAR}
+    </select>
+
+
+	<update id="updateOrderDetails" parameterType="com.cal.bean.OrderDetails">
+	    update order_details 
+	    <set> 
+	    <if test="quoteId != null">
+			quoteId = #{quoteId,jdbcType=VARCHAR},
+		</if>
+	    <if test="partName != null">
+			part_name = #{partName,jdbcType=VARCHAR},
+		</if>
+	    <if test="goodsTypeId != null">
+			goods_type_id = #{goodsTypeId,jdbcType=INTEGER},
+		</if>
+	    <if test="materialId != null">
+			material_id = #{materialId,jdbcType=INTEGER},
+		</if>
+	    <if test="parameterMm != null">
+			parameter_mm = #{parameterMm,jdbcType=VARCHAR},
+		</if>
+	    <if test="productSize != null">
+			product_size = #{productSize,jdbcType=VARCHAR},
+		</if>
+	    <if test="parameterInch != null">
+			parameter_inch = #{parameterInch,jdbcType=VARCHAR},
+		</if>
+	    <if test="goodsSet != null">
+			goods_set = #{goodsSet,jdbcType=INTEGER},
+		</if>
+	    <if test="weight != null">
+			weight = #{weight,jdbcType=DOUBLE},
+		</if>
+	    <if test="superficialArea != null">
+			superficial_area = #{superficialArea,jdbcType=DOUBLE},
+		</if>
+	    <if test="space != null">
+			space = #{space,jdbcType=DOUBLE},
+		</if>
+	    <if test="price != null">
+			price = #{price,jdbcType=DOUBLE},
+		</if>
+	    <if test="productProcessPrice != null">
+			product_process_price = #{productProcessPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="unitPrice != null">
+			unit_price = #{unitPrice,jdbcType=DOUBLE},
+		</if>
+	    <if test="insideOutsideState != null">
+			inside_outside_state = #{insideOutsideState,jdbcType=INTEGER},
+		</if>
+
+	    </set>
+		 where id = #{id,jdbcType=INTEGER}
+		
+	</update>
+	
+	
+		<insert id="insertArray" parameterType="java.util.List">
+		insert into order_details 
+		(
+		quoteId, part_name,goods_type_id,
+		material_id,parameter_mm,product_size,parameter_inch,
+		goods_set,weight,weight_unit,superficial_area,superficial_area_unit,
+		space, space_unit, price ,product_process_price,
+		unit_price  
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=","> 
+		(
+		#{item.quoteId},
+		#{item.partName},
+		#{item.goodsTypeId},
+		#{item.materialId},
+		#{item.parameterMm},
+		#{item.productSize},
+		#{item.parameterInch},
+		#{item.goodsSet},		
+		#{item.weight},
+		#{item.weightUnit},
+		#{item.superficialArea},
+		#{item.superficialAreaUnit},
+		#{item.space},
+		#{item.spaceUnit},
+		#{item.price},
+		#{item.productProcessPrice},
+		#{item.unitPrice}
+		)
+		</foreach>
+		</insert>
+		
+	<!-- 根据报价号删除 -->
+	<delete id="deleteByQuoteId" parameterType="string">
+	    delete from order_details
+	    where quoteId = #{quoteId,jdbcType=VARCHAR}
+	</delete>	
+		
+	<!-- 根据orderDetailsId删除 -->
+	<delete id="deleteById" parameterType="int">
+	    delete from order_details
+	    where id = #{id,jdbcType=INTEGER}
+	</delete>	
+		
+</mapper>

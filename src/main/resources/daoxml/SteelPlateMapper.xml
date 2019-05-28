@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cbt.mapper.SteelPlateMapper">
+	<resultMap id="BaseResultMap" type="com.cbt.model.SteelPlate">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="itemId" property="itemid" jdbcType="VARCHAR" />
+		<result column="guaPaiShangJia" property="guapaishangjia"
+			jdbcType="VARCHAR" />
+		<result column="pinMing" property="pinming" jdbcType="VARCHAR" />
+		<result column="caiZhi" property="caizhi" jdbcType="VARCHAR" />
+		<result column="guiGe" property="guige" jdbcType="VARCHAR" />
+		<result column="changJia" property="changjia" jdbcType="VARCHAR" />
+		<result column="cunHuoDi" property="cunhuodi" jdbcType="VARCHAR" />
+		<result column="zhongLiang" property="zhongliang" jdbcType="VARCHAR" />
+		<result column="jiaGe" property="jiage" jdbcType="VARCHAR" />
+		<result column="shopId" property="shopid" jdbcType="VARCHAR" />
+		<result column="high" property="high" jdbcType="VARCHAR" />
+		<result column="width" property="width" jdbcType="VARCHAR" />
+		<result column="length" property="length" jdbcType="VARCHAR" />
+		<result column="zhonglei" property="zhonglei" jdbcType="VARCHAR" />
+		
+		<result column="categoryid" property="categoryid" jdbcType="INTEGER" />
+		<result column="min_unit_price" property="minUnitPrice" jdbcType="VARCHAR" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		id, itemId, guaPaiShangJia, pinMing, caiZhi, guiGe, changJia, cunHuoDi,
+		zhongLiang,
+		jiaGe, shopId, high, width, length, zhonglei
+	</sql>
+	
+	<select id="queryByKey" resultMap="BaseResultMap" parameterType="com.cbt.model.SteelPlate">	
+	  select 
+	  <include refid="Base_Column_List" />
+	  from steel_plate1
+	  where LENGTH(0+high)=LENGTH(high)  and LENGTH(0+width)=LENGTH(width) and LENGTH(0+length)=LENGTH(length) and length != 'L'
+	  <if test="zhonglei != null and zhonglei != '' " >
+		 and zhonglei = #{zhonglei,jdbcType = VARCHAR}
+	  </if>
+	  <if test="pinming != null and pinming != '' " >
+		 and pinMing = #{pinming,jdbcType = VARCHAR}
+	  </if>
+	  <if test="caizhi != null and caizhi != '' " >
+		 and caiZhi = #{caizhi,jdbcType = VARCHAR}
+	  </if>
+	  <if test="high != null and high != '' " >
+		 and high = #{high,jdbcType = VARCHAR}
+	  </if>
+	  <if test="width1 != null and width1 != '' " >
+		 and width &gt;= #{width1,jdbcType = VARCHAR}
+	  </if>
+	  <if test="width2 != null and width2 != '' " >
+		 and width &lt;= #{width2,jdbcType = VARCHAR}
+	  </if>
+	  <if test="length1 != null and length1 != '' " >
+		 and length &gt;= #{length1,jdbcType = VARCHAR}
+	  </if>
+	  <if test="length2 != null and length2 != '' " >
+		 and length &lt;= #{length2,jdbcType = VARCHAR}
+	  </if>	 
+	  limit #{start}, #{pageSize} 
+	</select>
+
+<!-- 查询总数量 -->
+	<select id="queryTotal" resultType="int">	
+	  select 
+	  count(*) 
+	  from steel_plate1
+	  where LENGTH(0+high)=LENGTH(high)  and LENGTH(0+width)=LENGTH(width) and LENGTH(0+length)=LENGTH(length)
+	  <if test="zhonglei != null and zhonglei != '' " >
+		 and zhonglei = #{zhonglei,jdbcType = VARCHAR}
+	  </if>
+	  <if test="pinming != null and pinming != '' " >
+		 and pinMing = #{pinming,jdbcType = VARCHAR}
+	  </if>
+	  <if test="caizhi != null and caizhi != '' " >
+		 and caiZhi = #{caizhi,jdbcType = VARCHAR}
+	  </if>
+	  <if test="high != null and high != '' " >
+		 and high = #{high,jdbcType = VARCHAR}
+	  </if>
+	  <if test="width1 != null and width1 != '' " >
+		 and width &gt;= #{width1,jdbcType = VARCHAR}
+	  </if>
+	  <if test="width2 != null and width2 != '' " >
+		 and width &lt;= #{width2,jdbcType = VARCHAR}
+	  </if>
+	  <if test="length1 != null and length1 != '' " >
+		 and length &gt;= #{length1,jdbcType = VARCHAR}
+	  </if>
+	  <if test="length2 != null and length2 != '' " >
+		 and length &lt;= #{length2,jdbcType = VARCHAR}
+	  </if>	  
+	</select>
+
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from steel_plate1
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<!-- 根据品名查询 -->
+	<select id="queryPinMing" resultMap="BaseResultMap" parameterType="string">
+		select
+		<include refid="Base_Column_List" />
+		from steel_plate1
+		where pinMing = #{pinming,jdbcType=VARCHAR}
+	</select>
+
+
+    <!-- 根据品名集合查询产品 -->
+	<select id="queryByPinMing" resultMap="BaseResultMap" parameterType="string">
+	    select
+	    <include refid="Base_Column_List"/> 
+	    from steel_plate1
+	    where pinMing in
+	    <foreach collection="array" item="pinming" open="(" close=")" separator=",">
+			#{pinming}
+		</foreach>
+	</select>
+	
+	
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+		delete from steel_plate1
+		where id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<insert id="insert" parameterType="com.cbt.model.SteelPlate">
+		insert into steel_plate1 (id, itemId, guaPaiShangJia,
+		pinMing, caiZhi, guiGe,
+		changJia, cunHuoDi, zhongLiang,
+		jiaGe, shopId, high,
+		width, length, zhonglei,
+		categoryid)
+		values (#{id,jdbcType=INTEGER}, #{itemid,jdbcType=VARCHAR},
+		#{guapaishangjia,jdbcType=VARCHAR},
+			#{pinming,jdbcType=VARCHAR}, #{caizhi,jdbcType=VARCHAR}, #{guige,jdbcType=VARCHAR},
+			#{changjia,jdbcType=VARCHAR}, #{cunhuodi,jdbcType=VARCHAR},
+			#{zhongliang,jdbcType=VARCHAR},
+			#{jiage,jdbcType=VARCHAR}, #{shopid,jdbcType=VARCHAR}, #{high,jdbcType=VARCHAR},
+			#{width,jdbcType=VARCHAR}, #{length,jdbcType=VARCHAR},
+			#{zhonglei,jdbcType=VARCHAR},
+			#{categoryid,jdbcType=INTEGER})
+		</insert>
+
+<!--     根据品名查询材质 -->
+<!--     <select id="queryCaizhiByPinMing" parameterType="string" resultType="java.util.List"> -->
+<!--          select caiZhi        -->
+<!--          from steel_plate1 where pinMing = #{pinming,jdbcType = VARCHAR} GROUP BY caiZhi -->
+<!--     </select> -->
+   
+    <!-- 根据品名、材质查询所有规格产品 -->
+    <select id="querySteelPlateByHighOld" parameterType="string" resultMap="BaseResultMap">
+        select *,MIN(jiaGe) from steel_plate1 
+        where pinMing = #{pinming,jdbcType=VARCHAR} and caiZhi = #{caizhi,jdbcType=VARCHAR}
+           GROUP BY
+        caiZhi,high 
+          order by 
+        caiZhi,(high + 0.0) LIMIT 0,3
+    </select>
+    
+        <!-- 根据品名查询材质 -->
+    <select id="queryCaizhiByPinMingOld" parameterType="string" resultType="java.util.List">
+        select caiZhi from steel_plate1 where pinMing = #{pinming,jdbcType=VARCHAR GROUP BY caiZhi
+    </select>
+    
+        <!-- 根据品名、材质查询所有规格产品 -->
+    <select id="querySteelPlateByHighNew" parameterType="string" resultMap="BaseResultMap">
+        select *,MIN(jiaGe) from steel_plate 
+        where pinMing = #{pinming,jdbcType=VARCHAR} and caiZhi = #{caizhi,jdbcType=VARCHAR}
+           GROUP BY
+        caiZhi,high 
+          order by 
+        caiZhi,(high + 0.0) LIMIT 0,3
+    </select>
+    
+    <!-- 根据品名查询材质 -->
+    <select id="queryCaizhiByPinMingNew" parameterType="string" resultType="java.util.List">
+        select caiZhi from steel_plate1 where pinMing = #{pinming,jdbcType=VARCHAR GROUP BY caiZhi
+    </select>
+    
+    
+<!-- 	<update id="updateByExampleSelective" parameterType="map"> -->
+<!-- 		update steel_plate1 -->
+<!-- 		<set> -->
+<!-- 			<if test="record.id != null"> -->
+<!-- 				id = #{record.id,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.itemid != null"> -->
+<!-- 				itemId = #{record.itemid,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.guapaishangjia != null"> -->
+<!-- 				guaPaiShangJia = #{record.guapaishangjia,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.pinming != null"> -->
+<!-- 				pinMing = #{record.pinming,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.caizhi != null"> -->
+<!-- 				caiZhi = #{record.caizhi,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.guige != null"> -->
+<!-- 				guiGe = #{record.guige,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.changjia != null"> -->
+<!-- 				changJia = #{record.changjia,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.cunhuodi != null"> -->
+<!-- 				cunHuoDi = #{record.cunhuodi,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.zhongliang != null"> -->
+<!-- 				zhongLiang = #{record.zhongliang,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.jiage != null"> -->
+<!-- 				jiaGe = #{record.jiage,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.shopid != null"> -->
+<!-- 				shopId = #{record.shopid,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.high != null"> -->
+<!-- 				high = #{record.high,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.width != null"> -->
+<!-- 				width = #{record.width,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.length != null"> -->
+<!-- 				length = #{record.length,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.zhonglei != null"> -->
+<!-- 				zhonglei = #{record.zhonglei,jdbcType=VARCHAR}, -->
+<!-- 			</if> -->
+<!-- 			<if test="record.categoryid != null"> -->
+<!-- 				categoryid = #{record.categoryid,jdbcType=INTEGER}, -->
+<!-- 			</if> -->
+<!-- 		</set> -->
+<!-- 		<if test="_parameter != null"> -->
+<!-- 			<include refid="Update_By_Example_Where_Clause" /> -->
+<!-- 		</if> -->
+<!-- 	</update> -->
+	
+</mapper>

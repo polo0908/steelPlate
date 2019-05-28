@@ -1,0 +1,126 @@
+package com.cal.bean;
+
+import java.io.Serializable;
+
+public class ProcessDetails implements Serializable {
+
+	  
+	  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Integer id;
+	  private Integer orderDetailsId;   //产品id
+	  private Integer goodsProcessId;   //产品选择的工艺id
+	  private String level1Parameter;   //一级菜单参数
+	  private String level2Parameter;   //二级菜单参数
+	  private Double level3Parameter;   //三级菜单参数
+	  private Double unitPrice;  //单位价格
+	  private String unit;  //单位
+	  private Integer outsideSurface;  //是否表面操作（0:不操作，1:操作）
+	  private Integer insideSurface;   //是否表面操作（0:不操作，1:操作）
+	  private Double processPrice;    //工艺价格
+	  private Integer insideOutsideState; //单表面还是可选择表面(0：单面 1：双面）
+	  
+
+	  private String level1;           //工艺名称
+	  
+	  
+	  
+	  
+	public String getLevel1() {
+		return level1;
+	}
+	public void setLevel1(String level1) {
+		this.level1 = level1;
+	}
+	public Integer getInsideOutsideState() {
+		return insideOutsideState;
+	}
+	public void setInsideOutsideState(Integer insideOutsideState) {
+		this.insideOutsideState = insideOutsideState;
+	}
+	public Double getProcessPrice() {
+		return processPrice;
+	}
+	public void setProcessPrice(Double processPrice) {
+		this.processPrice = processPrice;
+	}
+	public Integer getOrderDetailsId() {
+		return orderDetailsId;
+	}
+	public void setOrderDetailsId(Integer orderDetailsId) {
+		this.orderDetailsId = orderDetailsId;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Integer getGoodsProcessId() {
+		return goodsProcessId;
+	}
+	public void setGoodsProcessId(Integer goodsProcessId) {
+		this.goodsProcessId = goodsProcessId;
+	}
+
+	public String getLevel1Parameter() {
+		return level1Parameter;
+	}
+	public void setLevel1Parameter(String level1Parameter) {
+		this.level1Parameter = level1Parameter;
+	}
+	public String getLevel2Parameter() {
+		return level2Parameter;
+	}
+	public void setLevel2Parameter(String level2Parameter) {
+		this.level2Parameter = level2Parameter;
+	}
+	public Double getLevel3Parameter() {
+		return level3Parameter;
+	}
+	public void setLevel3Parameter(Double level3Parameter) {
+		this.level3Parameter = level3Parameter;
+	}
+	public Double getUnitPrice() {
+		return unitPrice;
+	}
+	public void setUnitPrice(Double unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	public String getUnit() {
+		return unit;
+	}
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+	public Integer getOutsideSurface() {
+		return outsideSurface;
+	}
+	public void setOutsideSurface(Integer outsideSurface) {
+		this.outsideSurface = outsideSurface;
+	}
+	public Integer getInsideSurface() {
+		return insideSurface;
+	}
+	public void setInsideSurface(Integer insideSurface) {
+		this.insideSurface = insideSurface;
+	}
+	@Override
+	public String toString() {
+		return "ProcessDetails [id=" + id + ", orderDetailsId="
+				+ orderDetailsId + ", goodsProcessId=" + goodsProcessId
+				+ ", level1Parameter=" + level1Parameter + ", level2Parameter="
+				+ level2Parameter + ", level3Parameter=" + level3Parameter
+				+ ", unitPrice=" + unitPrice + ", unit=" + unit
+				+ ", outsideSurface=" + outsideSurface + ", insideSurface="
+				+ insideSurface + ", processPrice=" + processPrice
+				+ ", insideOutsideState=" + insideOutsideState + ", level1="
+				+ level1 + "]";
+	}
+	  
+	  
+	  
+	  
+}

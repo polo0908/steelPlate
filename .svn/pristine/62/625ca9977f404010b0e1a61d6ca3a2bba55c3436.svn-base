@@ -1,0 +1,65 @@
+.big-box{margin:0 auto;width:980px;border:1px solid #cdcdcd;}
+.big-box2{margin:0 auto;width:980px;border:1px solid #cdcdcd;margin-top: 20px;}
+.div-left{
+    float: left;
+}
+.div-right{
+    margin-bottom: 20px;
+    float: right;
+}
+.dataTables_wrapper{overflow-y: scroll;
+    overflow-x: hidden;min-height: 200px;
+    max-height: 300px;}
+.w-bottom{padding-bottom: 20px;}
+.w-text{width: 63%;margin: 0 auto;}
+.w-text p{margin-top: 5px;float: left; margin-right: 5px;}
+.w-text input{width: 80px;  margin-bottom: 0px;}
+.table{height: 262px;}
+.table-bordered th:first-child, .table-bordered td:first-child {border-left:none;}
+.widget-title, .modal-header, .table th, div.dataTables_wrapper .ui-widget-header{border-bottom: none;}
+#breadcrumb{margin-top:20px;}
+.div-left span{
+    font-size: 14px;
+    color:#d14;
+}
+.gradeA>td{
+    text-align: center;
+}
+.widget-box{
+    margin-top:0px ;
+}
+#breadcrumb a{font-size: 14px;color:#00a2e9; }
+.w-group .w-control-label{float: left;padding-top: 15px;padding-left: 20px;}
+.w-group .w-controls{padding: 10px 0;}
+.w-group .w-controls2{padding: 10px 0;line-height: 30px;margin-left: 180px;color:#00a2e9; }
+.w-group .w-controls2 span{color:#666;padding-left: 5px;}
+.w-group .w-controls select{margin-left: 20px;margin-bottom: 0px;}
+.w-group{border-top: 1px solid #ffffff;border-bottom: 1px solid #eeeeee;margin-bottom: 0;}
+.big-box2 .w-group .w-cm-3{ width: 33.33333333%;float: left;}
+.big-box2 .w-group .w-cm-5{ width: 50%;float: left;position: relative;}
+.big-box2 .w-group .w-cm-5 .w-click{top: 12px;
+    position: absolute;
+    left: 55%;}
+.w-group .w-one3{padding-top: 10px;}
+.w-left{padding-left: 20px;}
+.w-left p{ padding: 15px 0;margin: 0;font-size: 14px;}
+.w-left .show-span{color: #ff7f59;font-weight: 700;}
+.w-btn{width: 980px;margin: 0 auto;}
+.w-btn .w-last{padding-top: 20px;float: right;}
+.table-w{padding: 20px 0;}
+.z-a-style{text-decoration: underline;color: #666; margin-left:30px;}
+.z-a-style:hover{
+    color: #333333;
+    cursor:pointer;
+}
+.w-out-box{margin: 0 auto;width: 980px;}
+.big-box-w{top: 80px;width: 980px;}
+#DataTables_Table_0 .w-default{background:#006dcc;color:#fff;}
+.w-wrapper .w-text-h1{color: #00a2e9;text-align: center;}
+.w-wrapper{margin-top:30px;width: 1139px;}
+.w-form-control{font-size:20px;}
+.w-item_box{overflow-x: hidden;width:400px;}
+.w_div_back a{font-size: 14px;color: #00a2e9;}
+.w_div_back a:hover {
+    color: #333333;
+}

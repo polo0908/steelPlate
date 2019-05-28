@@ -1,0 +1,1 @@
+$(function(){$("body").on("keyup","input.form-control",function(){var reg=/^\d+\.?(\d{1,2})?$/;while(!reg.test($(this).val())&&$(this).val()!=""){$(this).val(checkStr($(this).val()));}}); function checkStr(str){str=str.substring(0,str.length-1);return str;}})

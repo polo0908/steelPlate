@@ -1,0 +1,267 @@
+package com.cal.bean;
+
+import java.io.Serializable;
+
+public class ClientOrder implements Serializable {
+
+
+	  
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Integer id;
+	  private String username;   //客户名
+	  private Integer userId;     //客户id
+	  private String quoteId;    //订单号
+	  private String createTime;  //创建时间
+	  private String ip;          //Ip地址
+	  private String companyName;  //公司名称
+	  private String email;       //邮箱
+	  private Integer totalSets;  //总件数
+	  private Double totalWeight;  //总重
+	  private Double totalSpace;   //总空间
+	  private String weightUnit;   //重量单位
+	  private String spaceUnit;    //体积单位
+	  private Double totalPrice;   //总价格
+	  private String country;      //国家
+	  private String city;         //城市
+	  private Double fobPrice;     //离岸价格
+	  private Double cifPrice;     //加上运费价格
+	  private Double profitManagment;      //利润管理费
+	  private Double profitRate;           //利润率
+	  private Double tax;                  //税费
+	  private Double shippingFee;          //运费
+      private Double discount;             //折扣费
+      private Double finallyPrice;         //产品总价（除去运费价格）
+      private String modeOfTransport;      //运输方式（整柜、拼箱）
+      private Double packing;              //拖车费
+	  private Double shippingFeeLcl;  //拼箱运费
+	  private Double shippingFeeFcl;  //整柜运费
+	  private Integer amountUnit;      //金额单元
+	  private Double selectUnitPrice;  //选择货币单元的总额
+	  private Double inlandShippingCost; //国内运输费
+	  private String orderPlan;          //订单计划
+    	  
+    
+
+	public String getOrderPlan() {
+		return orderPlan;
+	}
+	public void setOrderPlan(String orderPlan) {
+		this.orderPlan = orderPlan;
+	}
+	public Double getInlandShippingCost() {
+		return inlandShippingCost;
+	}
+	public void setInlandShippingCost(Double inlandShippingCost) {
+		this.inlandShippingCost = inlandShippingCost;
+	}
+	public Integer getAmountUnit() {
+		return amountUnit;
+	}
+	public void setAmountUnit(Integer amountUnit) {
+		this.amountUnit = amountUnit;
+	}
+	public Double getSelectUnitPrice() {
+		return selectUnitPrice;
+	}
+	public void setSelectUnitPrice(Double selectUnitPrice) {
+		this.selectUnitPrice = selectUnitPrice;
+	}
+	public Double getPacking() {
+		return packing;
+	}
+	public void setPacking(Double packing) {
+		this.packing = packing;
+	}
+	public String getModeOfTransport() {
+		return modeOfTransport;
+	}
+	public void setModeOfTransport(String modeOfTransport) {
+		this.modeOfTransport = modeOfTransport;
+	}
+	public Double getFinallyPrice() {
+		return finallyPrice;
+	}
+	public void setFinallyPrice(Double finallyPrice) {
+		this.finallyPrice = finallyPrice;
+	}
+	public Double getDiscount() {
+		return discount;
+	}
+	public void setDiscount(Double discount) {
+		this.discount = discount;
+	}
+	public Double getShippingFee() {
+		return shippingFee;
+	}
+	public void setShippingFee(Double shippingFee) {
+		this.shippingFee = shippingFee;
+	}
+	public Double getProfitManagment() {
+		return profitManagment;
+	}
+	public void setProfitManagment(Double profitManagment) {
+		this.profitManagment = profitManagment;
+	}
+	public Double getProfitRate() {
+		return profitRate;
+	}
+	public void setProfitRate(Double profitRate) {
+		this.profitRate = profitRate;
+	}
+	public Double getTax() {
+		return tax;
+	}
+	public void setTax(Double tax) {
+		this.tax = tax;
+	}
+	public Double getShippingFeeLcl() {
+		return shippingFeeLcl;
+	}
+	public void setShippingFeeLcl(Double shippingFeeLcl) {
+		this.shippingFeeLcl = shippingFeeLcl;
+	}
+	public Double getShippingFeeFcl() {
+		return shippingFeeFcl;
+	}
+	public void setShippingFeeFcl(Double shippingFeeFcl) {
+		this.shippingFeeFcl = shippingFeeFcl;
+	}
+	public Integer getUserId() {
+		return userId;
+	}
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public Double getFobPrice() {
+		return fobPrice;
+	}
+	public void setFobPrice(Double fobPrice) {
+		this.fobPrice = fobPrice;
+	}
+	public Double getCifPrice() {
+		return cifPrice;
+	}
+	public void setCifPrice(Double cifPrice) {
+		this.cifPrice = cifPrice;
+	}
+	public Double getTotalPrice() {
+		return totalPrice;
+	}
+	public void setTotalPrice(Double totalPrice) {
+		this.totalPrice = totalPrice;
+	}
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getQuoteId() {
+		return quoteId;
+	}
+	public void setQuoteId(String quoteId) {
+		this.quoteId = quoteId;
+	}
+
+	public String getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+	public String getCompanyName() {
+		return companyName;
+	}
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public Integer getTotalSets() {
+		return totalSets;
+	}
+	public void setTotalSets(Integer totalSets) {
+		this.totalSets = totalSets;
+	}
+	public Double getTotalWeight() {
+		return totalWeight;
+	}
+	public void setTotalWeight(Double totalWeight) {
+		this.totalWeight = totalWeight;
+	}
+	public Double getTotalSpace() {
+		return totalSpace;
+	}
+	public void setTotalSpace(Double totalSpace) {
+		this.totalSpace = totalSpace;
+	}
+	public String getWeightUnit() {
+		return weightUnit;
+	}
+	public void setWeightUnit(String weightUnit) {
+		this.weightUnit = weightUnit;
+	}
+	public String getSpaceUnit() {
+		return spaceUnit;
+	}
+	public void setSpaceUnit(String spaceUnit) {
+		this.spaceUnit = spaceUnit;
+	}
+	@Override
+	public String toString() {
+		return "ClientOrder [id=" + id + ", username=" + username + ", userId="
+				+ userId + ", quoteId=" + quoteId + ", createTime="
+				+ createTime + ", ip=" + ip + ", companyName=" + companyName
+				+ ", email=" + email + ", totalSets=" + totalSets
+				+ ", totalWeight=" + totalWeight + ", totalSpace=" + totalSpace
+				+ ", weightUnit=" + weightUnit + ", spaceUnit=" + spaceUnit
+				+ ", totalPrice=" + totalPrice + ", country=" + country
+				+ ", city=" + city + ", fobPrice=" + fobPrice + ", cifPrice="
+				+ cifPrice + ", profitManagment=" + profitManagment
+				+ ", profitRate=" + profitRate + ", tax=" + tax
+				+ ", shippingFee=" + shippingFee + ", discount=" + discount
+				+ ", finallyPrice=" + finallyPrice + ", modeOfTransport="
+				+ modeOfTransport + ", packing=" + packing
+				+ ", shippingFeeLcl=" + shippingFeeLcl + ", shippingFeeFcl="
+				+ shippingFeeFcl + ", amountUnit=" + amountUnit
+				+ ", selectUnitPrice=" + selectUnitPrice
+				+ ", inlandShippingCost=" + inlandShippingCost + ", orderPlan="
+				+ orderPlan + "]";
+	}
+	  
+	  
+	  
+	
+}

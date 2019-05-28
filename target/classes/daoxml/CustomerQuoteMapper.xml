@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.CustomerQuoteMapper">
+	<resultMap id="customerQuoteResultMap" type="com.cal.bean.CustomerQuote">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="quoteId" property="quoteId" jdbcType="VARCHAR" />
+		<result column="customer_id" property="customerId" jdbcType="INTEGER" />
+		<result column="requirements" property="requirements" jdbcType="LONGVARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<sql id="customerQuoteColumnList">
+		id,quoteId,customer_id,requirements,create_time
+	</sql>
+
+
+	<insert id="insertCustomerQuote" useGeneratedKeys="true" keyProperty="id" parameterType="com.cal.bean.CustomerQuote">
+		insert into customer_quote
+		(
+        id,quoteId,customer_id,requirements,create_time
+		)
+		values 
+		(
+		#{id,jdbcType=INTEGER},
+		#{quoteId,jdbcType=VARCHAR},
+		#{customerId,jdbcType=INTEGER},
+		#{requirements,jdbcType=LONGVARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}
+		)
+	</insert>
+   
+
+</mapper>

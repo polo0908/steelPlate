@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cal.dao.GoodsTypeInfoMapper">
+	<resultMap id="goodsTypeInfoResultMap" type="com.cal.bean.GoodsTypeInfo">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="goods_type" property="goodsType" jdbcType="VARCHAR" />
+		<result column="parameter" property="parameter" jdbcType="VARCHAR" />
+		<result column="goods_type_cn" property="goodsTypeCn" jdbcType="VARCHAR" />
+		<result column="goods_image" property="goodsImage" jdbcType="VARCHAR" />
+		<result column="inside_outside_state" property="insideOutsideState" jdbcType="INTEGER" />
+		<result column="original_parameter" property="originalParameter" jdbcType="VARCHAR" />
+
+	</resultMap>
+
+	<sql id="goodsTypeInfoColumnList">
+		id,goods_type,parameter, goods_type_cn, goods_image,inside_outside_state,original_parameter
+	</sql>
+
+	<select id="queryById" resultMap="goodsTypeInfoResultMap"
+		parameterType="java.lang.Integer">
+		select 
+		<include refid="goodsTypeInfoColumnList" />
+		from goods_type_info 
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+	<select id="queryAll" resultMap="goodsTypeInfoResultMap">
+	    select 
+		<include refid="goodsTypeInfoColumnList" />
+		from goods_type_info 
+	</select>
+	
+	<select id="queryByGoodsType" resultMap="goodsTypeInfoResultMap" parameterType="string">
+	    select 
+		<include refid="goodsTypeInfoColumnList" />
+		from goods_type_info 
+		where goods_type = #{goodsType,jdbcType=VARCHAR}  
+	</select>
+
+</mapper>
